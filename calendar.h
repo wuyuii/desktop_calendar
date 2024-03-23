@@ -5,6 +5,7 @@
 #include <QDate>
 #include <QSet>
 #include <QMap>
+#include<QTimer>
 #include "plan.h"
 
 QT_BEGIN_NAMESPACE
@@ -22,8 +23,10 @@ public:
     QDate cur_date;// 当前日期
     QDate selected_date;// 选中的日期
     QString default_plan_filename;// 默认日程文件路径
-
+    QTimer *timer;//定时器对象
+    QTimer *timer_check_event;//定时器对象
     QMap<plan,qint64> plan_data_index_map; // plan 对应 行号
+
 
     void show_calendar();
     void clear_calendar();
@@ -37,9 +40,15 @@ signals:
 
 private slots:
     void date_clicked(const QDate &date);
+    void updateTimeLabel();
+    void closest_to_the_event();//测试弹窗用的，后面
 
 private:
     Ui::calendar *ui;
+
+
+
+
 
 };
 #endif // CALENDAR_H

@@ -11,13 +11,16 @@
 
 class plan {
 
+//    // TODO 如果title 或 location 包含 换行符 ，则需要转义 文本中的换行符
+//    QString title;
+//    QString location;
+//    QDateTime time;
+
+public:
     // TODO 如果title 或 location 包含 换行符 ，则需要转义 文本中的换行符
     QString title;
     QString location;
     QDateTime time;
-
-public:
-
     static const QString DELIMITER;
     static const QString ABANDONED_SYMBOL;
 
