@@ -40,21 +40,21 @@ public:
     {
         if (calendar->objectName().isEmpty())
             calendar->setObjectName(QString::fromUtf8("calendar"));
-        calendar->resize(1077, 600);
+        calendar->resize(1118, 743);
         centralwidget = new QWidget(calendar);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         widget = new QWidget(centralwidget);
         widget->setObjectName(QString::fromUtf8("widget"));
-        widget->setGeometry(QRect(10, 10, 581, 101));
+        widget->setGeometry(QRect(30, 10, 581, 101));
         time_label = new QLabel(widget);
         time_label->setObjectName(QString::fromUtf8("time_label"));
-        time_label->setGeometry(QRect(30, 20, 72, 15));
+        time_label->setGeometry(QRect(30, 10, 541, 31));
         date_label = new QLabel(widget);
         date_label->setObjectName(QString::fromUtf8("date_label"));
-        date_label->setGeometry(QRect(30, 50, 72, 15));
+        date_label->setGeometry(QRect(30, 60, 541, 31));
         gridLayoutWidget = new QWidget(centralwidget);
         gridLayoutWidget->setObjectName(QString::fromUtf8("gridLayoutWidget"));
-        gridLayoutWidget->setGeometry(QRect(20, 180, 571, 361));
+        gridLayoutWidget->setGeometry(QRect(20, 180, 535, 460));
         gridLayout = new QGridLayout(gridLayoutWidget);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
@@ -70,7 +70,7 @@ public:
         calendar->setCentralWidget(centralwidget);
         menubar = new QMenuBar(calendar);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1077, 26));
+        menubar->setGeometry(QRect(0, 0, 1118, 26));
         calendar->setMenuBar(menubar);
         statusbar = new QStatusBar(calendar);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));

@@ -18,8 +18,12 @@ class plan {
 
 public:
     // TODO 如果title 或 location 包含 换行符 ，则需要转义 文本中的换行符
+
+
+    size_t id; // 从 1 开始自增
     QString title;
     QString location;
+    QString context;
     QDateTime time;
     static const QString DELIMITER;
     static const QString ABANDONED_SYMBOL;

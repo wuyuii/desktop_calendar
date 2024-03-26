@@ -25,8 +25,8 @@ public:
     QString default_plan_filename;// 默认日程文件路径
     QTimer *timer;//定时器对象
     QTimer *timer_check_event;//定时器对象
-    QMap<plan,qint64> plan_data_index_map; // plan 对应 行号
 
+    QVector<plan> plans;// 下标 + 1 对应 plan里的 id
 
     void show_calendar();
     void clear_calendar();
