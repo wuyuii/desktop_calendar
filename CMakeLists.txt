@@ -19,7 +19,8 @@ set(PROJECT_SOURCES
         calendar.cpp
         calendar.h
         calendar.ui
-        plan.cpp plan.h)
+        plan.cpp plan.h
+        lib/lunar.h lib/lunar.cpp)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(calendar
