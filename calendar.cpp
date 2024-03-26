@@ -33,13 +33,17 @@ calendar::calendar(QWidget *parent)
     show_calendar();
 
 
-timer_check_event = new QTimer(this);
+    timer_check_event = new QTimer(this);
 
    // 连接定时器的timeout()信号到槽函数
    connect(timer_check_event, &QTimer::timeout, this, &calendar::closest_to_the_event);
 
    // 设置定时器间隔为1分钟
    timer_check_event->start(60000);
+
+
+    int padding = 10; // 设置内边距大小
+    ui->gridLayoutWidget->setContentsMargins(padding, padding, padding, padding);
 }
 
 
@@ -115,41 +119,41 @@ void calendar::show_calendar()
 
 
             auto *button = new QPushButton(this);
-
             connect(button, &QPushButton::clicked, this, [=]() {
                 date_clicked(tmp_date);
             });
             ui->gridLayout->addWidget(button, row, column);
 
-            //TODO 个性化日期显示效果
+            // 个性化日期显示效果
             button->setText(QString::number(tmp_date.day()));
-            button->setStyleSheet("border: none;");
-//            button->setStyleSheet("border: none;background-color: #3498db; color: white;"); // 默认样式
-//            button->setStyleSheet("border: none;QPushButton:hover { background-color: #2980b9; }"); // 悬停时的样式
+            button->setFixedSize(75, 75); // 按钮大小根据网格大小设定
 
+            QString styleSheet = "QPushButton {"
+                                 "    border-radius: 36px;" // 圆角半径固定为按钮高度的一半
+                                 "    padding: 10px;" // 内边距固定为20px
+                                 "}";
+            // 默认样式
             if (tmp_date.month() != selected_date.month()) {
-                        // 如果日期不是本月的，将按钮设置为灰白色
-                button->setStyleSheet("border: 1px solid transparent; background-color: #f0f0f0; color: #808080;");
-
+                styleSheet += "QPushButton {"
+                              "    border: 1px solid transparent; background-color: #f0f0f0; color: #808080;"
+                              "}";
             }
 
-            if(selected_date == tmp_date)
-            {    // TODO 如果是被选中的日期
-                // 可以在这里进行特殊标记或者高亮等操作
-             // button->setStyleSheet("background-color: lightblue; border: 2px solid blue; padding: 10px;");
-                button->setStyleSheet("background-color: transparent; border: 2px solid lightblue;  padding: 10px;");
-
-
+            // 被选中日期样式
+            if (selected_date == tmp_date) {
+                styleSheet += "QPushButton {"
+                              "    background-color: transparent; border: 2px solid lightblue; padding: 6px;"
+                              "}";
             }
 
-
-
-            if(cur_date == tmp_date)
-            {
-                // TODO 当前日期 效果
-                button->setStyleSheet("background-color: lightblue; border: 2px solid blue; padding: 10px;");
-
+            // 当前日期样式
+            if (cur_date == tmp_date) {
+                styleSheet += "QPushButton {"
+                              "    background-color: lightblue; border: 2px lightblue; padding: 6px;"
+                              "}";
             }
+
+            button->setStyleSheet(styleSheet);
 
             tmp_date = tmp_date.addDays(1);
         }
