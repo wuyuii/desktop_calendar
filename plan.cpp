@@ -11,13 +11,15 @@
 const QString plan::DELIMITER  = "\\|";
 const QString plan::ABANDONED_SYMBOL  = "\\~";
 
-plan::plan(QString title, QString location, QDateTime time) : title(std::move(title)), location(std::move(location)),
-                                                                                   time(std::move(time)) {}
+plan::plan(){}
+
+plan::plan(size_t id , QString title, QString location, QString context, QDateTime time)
+        : id(id), title(std::move(title)), location(std::move(location)), context(std::move(context)), time(std::move(time)) {}
 
 QString plan::to_string()
 {
-    QString context = QString(time.toString() + DELIMITER + title + DELIMITER + location + "\n");
-    return context;
+    QString str = QString(time.toString() + DELIMITER + title + DELIMITER + location + "\n");
+    return str;
 }
 
 void plan::update(const QString& filename, qint64 offset)

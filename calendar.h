@@ -8,6 +8,21 @@
 #include<QTimer>
 #include "plan.h"
 
+#include <QPushButton>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QDialog>
+#include <QLineEdit>
+#include <QTextEdit>
+#include <QPushButton>
+#include <QDateTime>
+#include <QFile>
+#include <QMessageBox>
+#include <QTextStream>
+#include <QDateTimeEdit>
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class calendar; }
 QT_END_NAMESPACE
@@ -29,6 +44,7 @@ public:
     QVector<plan> plans;// 下标 + 1 对应 plan里的 id
 
     void show_calendar();
+
     void clear_calendar();
 
     void read_plan_file();

@@ -28,7 +28,9 @@ public:
     static const QString DELIMITER;
     static const QString ABANDONED_SYMBOL;
 
-    plan(QString title, QString location, QDateTime time);
+    plan();
+
+    plan(size_t id, QString title, QString location, QString context, QDateTime time);
 
     QString to_string();
 

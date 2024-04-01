@@ -44,34 +44,106 @@ calendar::calendar(QWidget *parent)
 
     int padding = 10; // 设置内边距大小
     ui->gridLayoutWidget->setContentsMargins(padding, padding, padding, padding);
+
+    //创建日程
+    default_plan_filename = "plan.TXT";
+    connect(ui->add_plan_pushbutton, &QPushButton::clicked, this, &calendar::closest_to_the_event);
+    read_plan_file();//读取日程文件
+
 }
 
 
-void calendar::closest_to_the_event(){//后期改成去读map，现在由于map没有重载大小无法读取
-    QDateTime currentDateTime = QDateTime::currentDateTime();
+void calendar::closest_to_the_event(){
+    //后期改成去读map，现在由于map没有重载大小无法读取
+//    QDateTime currentDateTime = QDateTime::currentDateTime();
 
-    QDateTime time = QDateTime::currentDateTime();
-    plan myplan("考试","公交", time);
-    qDebug()<<myplan.time.toString("yyyy-MM-dd HH:mm")<<"xxxxx"<<currentDateTime.toString("yyyy-MM-dd HH:mm");
-   if (myplan.time.toString("yyyy-MM-dd HH:mm") == currentDateTime.toString("yyyy-MM-dd HH:mm")) {
+//    QDateTime time = QDateTime::currentDateTime();
 
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::information(this,
-                                         tr("事件提醒！"),
-                                        myplan.title,
-                                         QMessageBox::Ok | QMessageBox::Cancel,
-                                         QMessageBox::Ok);
+//    plan myplan("考试","公交", time);
+//    qDebug()<<myplan.time.toString("yyyy-MM-dd HH:mm")<<"xxxxx"<<currentDateTime.toString("yyyy-MM-dd HH:mm");
+//   if (myplan.time.toString("yyyy-MM-dd HH:mm") == currentDateTime.toString("yyyy-MM-dd HH:mm"))
+//   {
 
-        if (reply == QMessageBox::Ok) {
-            // 用户点击了OK按钮,可以弹出相关任务
-            // 在这里执行相关操作
-        } else {
-            // 用户点击了Cancel按钮或者点击了窗口右上角的关闭按钮
-            // 在这里执行相关操作
-        }
-    }
+//        QMessageBox::StandardButton reply;
+//        reply = QMessageBox::information(this,
+//                                         tr("事件提醒！"),
+//                                        myplan.title,
+//                                         QMessageBox::Ok | QMessageBox::Cancel,
+//                                         QMessageBox::Ok);
+//   }
+    // 创建一个对话框窗口
+     QDialog dialog(this);
+     dialog.setWindowTitle("添加日程");
+     dialog.setFixedSize(500, 600);
+
+     // 创建标签和文本框以输入标题
+     QLabel *titleLabel = new QLabel("标题:", &dialog);
+     QLineEdit *titleEdit = new QLineEdit(&dialog);
+
+     // 创建标签和文本框以输入地点
+     QLabel *location_label = new QLabel("地点:", &dialog);
+     QLineEdit *location_edit = new QLineEdit(&dialog);
+
+     // 创建详细信息和文本框以输入详情
+     QLabel *information_label = new QLabel("详细信息:", &dialog);
+     QLineEdit *information_edit = new QLineEdit(&dialog);
+     information_edit->setFixedSize(480,100); // 设置文本框的宽度为 200
+
+     // 创建标签和日期时间编辑器以输入时间
+     QLabel *timeLabel = new QLabel("时间:", &dialog);
+//     QDateTimeEdit *timeEdit = new QDateTimeEdit(&dialog);
+
+     QDateTimeEdit *timeEdit = new QDateTimeEdit(QDateTime::currentDateTime(), &dialog); // 设置默认时间为当前时间
 
 
+
+     // 创建保存和取消按钮
+     QPushButton *saveButton = new QPushButton("保存", &dialog);
+     QPushButton *cancelButton = new QPushButton("取消", &dialog);
+
+     // 连接保存按钮的点击信号到 lambda 表达式
+     connect(saveButton, &QPushButton::clicked, [&]() {
+         QString title = titleEdit->text(); // 获取标题文本
+         QString location = location_edit->text(); // 获取地点文本
+         QString information = information_edit->text(); // 获取详细信息文本
+         QDateTime time = timeEdit->dateTime(); // 获取日期时间
+
+         // 将日程信息格式化为字符串
+         QString schedule = time.toString( title + " | " + location + "|" + information + "|" + "yyyy-MM-dd hh:mm") + "\n" ;
+
+         // 打开文件以追加方式写入日程信息
+         QFile file(default_plan_filename);
+         if (file.open(QIODevice::Append | QIODevice::Text)) {
+             QTextStream out(&file);
+             out << schedule;
+             file.close();
+             read_plan_file();//读取更新后的日程信息
+         } else {
+             // 如果无法打开文件，则显示错误消息框
+             QMessageBox::critical(&dialog, "错误", "无法打开文件进行写入.");
+         }
+
+         dialog.close(); // 关闭对话框
+     });
+
+     // 连接取消按钮的点击信号到对话框的关闭槽函数
+     connect(cancelButton, &QPushButton::clicked, &dialog, &QDialog::close);
+
+     // 创建布局并将各个部件添加到布局中
+     QVBoxLayout *layout = new QVBoxLayout(&dialog);
+     layout->addWidget(titleLabel);
+     layout->addWidget(titleEdit);
+     layout->addWidget(location_label);
+     layout->addWidget(location_edit);
+     layout->addWidget(information_label);
+     layout->addWidget(information_edit);
+     layout->addWidget(timeLabel);
+     layout->addWidget(timeEdit);
+     layout->addWidget(saveButton);
+     layout->addWidget(cancelButton);
+
+     dialog.setLayout(layout); // 设置对话框的布局
+     dialog.exec(); // 显示对话框
 
 }
 
@@ -174,6 +246,35 @@ void calendar::date_clicked(const QDate &date)
 // TODO 按每行读取plan，删除有废弃符号的行并不读取，并将plan及对应的行号写入planDataIndexMap
 void calendar::read_plan_file()
 {
+    // 打开文件
+        QFile file(default_plan_filename);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            qDebug() << "无法打开文件" << default_plan_filename;
+            return;
+        }
+
+        // 读取文件内容
+        QTextStream in(&file);
+        size_t id = 1;
+        plan p;
+
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            QStringList parts = line.split("|", QString::SkipEmptyParts);
+            if (parts.size() >= 4) {
+                p.id = id;
+                id++;
+                p.title = parts[0].trimmed();
+                p.location = parts[1].trimmed();
+                p.context = parts[2].trimmed();
+                p.time = QDateTime::fromString(parts[3].trimmed(), "yyyy-MM-dd hh:mm");
+
+            }
+            plans.append(p);
+        }
+        // 关闭文件
+        file.close();
 
 }
 

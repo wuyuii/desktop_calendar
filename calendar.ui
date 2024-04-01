@@ -100,6 +100,19 @@
      <string>PushButton</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="add_plan_pushbutton">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>132</y>
+      <width>75</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>添加日程</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -107,7 +120,7 @@
      <x>0</x>
      <y>0</y>
      <width>1118</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>
