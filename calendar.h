@@ -53,7 +53,6 @@ public:
 
 signals:
 
-
 private slots:
     void date_clicked(const QDate &date);
     void updateTimeLabel();
@@ -61,10 +60,5 @@ private slots:
 
 private:
     Ui::calendar *ui;
-
-
-
-
-
 };
 #endif // CALENDAR_H

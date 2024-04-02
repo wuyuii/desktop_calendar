@@ -11,32 +11,26 @@
 
 class plan {
 
-//    // TODO 如果title 或 location 包含 换行符 ，则需要转义 文本中的换行符
-//    QString title;
-//    QString location;
-//    QDateTime time;
-
 public:
     // TODO 如果title 或 location 包含 换行符 ，则需要转义 文本中的换行符
-
 
     size_t id; // 从 1 开始自增
     QString title;
     QString location;
-    QString context;
+    QString information;
     QDateTime time;
+    bool delete_mask;// 0 表示 不废弃 ，1 表示 废弃
     static const QString DELIMITER;
-    static const QString ABANDONED_SYMBOL;
 
     plan();
 
-    plan(size_t id, QString title, QString location, QString context, QDateTime time);
+    plan(size_t id, QString title, QString location, QString information, QDateTime time);
 
-    QString to_string();
+    QString to_string() const;
 
     qint64 seek_offset(const QString& filename, qint64 offset);
 
-    void write(const QString& filename);
+    bool write(const QString& filename) const;
 
     void update(const QString& filename, qint64 offset);
 
@@ -44,6 +38,11 @@ public:
      * 废弃日程
      */
     void drop(const QString& filename, qint64 line_num);
+
+    /**
+     * 转义分隔符和换行符
+     */
+    static QString transcoding(const QString& string);
 };
 
 
