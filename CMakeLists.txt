@@ -11,15 +11,17 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Multimedia REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Multimedia REQUIRED)
 
 set(PROJECT_SOURCES
         main.cpp
         calendar.cpp
         calendar.h
         calendar.ui
-        plan.cpp plan.h)
+        plan.cpp plan.h
+        res.qrc
+        lib/lunar.h lib/lunar.cpp)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(calendar
@@ -44,7 +46,7 @@ else()
     endif()
 endif()
 
-target_link_libraries(calendar PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(calendar PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Multimedia)
 
 set_target_properties(calendar PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

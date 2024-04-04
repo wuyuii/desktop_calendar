@@ -7,17 +7,23 @@
 #include <utility>
 #include <QFile>
 #include <QTextStream>
+#include <QMessageBox>
+#include <QRegularExpression>
+#include <iostream>
 
-const QString plan::DELIMITER  = "\\|";
-const QString plan::ABANDONED_SYMBOL  = "\\~";
+const QString plan::DELIMITER  = "|";
 
-plan::plan(QString title, QString location, QDateTime time) : title(std::move(title)), location(std::move(location)),
-                                                                                   time(std::move(time)) {}
+plan::plan(){}
 
-QString plan::to_string()
+plan::plan(size_t id , QString title, QString location, QString information, QDateTime time)
+        : id(id), title(std::move(title)), location(std::move(location)), information(std::move(information)), time(std::move(time))
+        {
+    delete_mask = false;
+}
+
+QString plan::to_string() const
 {
-    QString context = QString(time.toString() + DELIMITER + title + DELIMITER + location + "\n");
-    return context;
+    return time.toString( (delete_mask ? '1' : '0') + transcoding(title) + DELIMITER + transcoding(location) + DELIMITER + transcoding(information) + DELIMITER + "yyyy-MM-dd hh:mm") + "\n";
 }
 
 void plan::update(const QString& filename, qint64 offset)
@@ -41,7 +47,6 @@ void plan::drop(const QString &filename, qint64 offset)
 
     // 在行首插入废弃符号表示废弃，在程序启动时删除有废弃符号的行
     file.seek(offset);
-    out << ABANDONED_SYMBOL;
 }
 
 
@@ -74,8 +79,27 @@ qint64 plan::seek_offset(const QString& filename, qint64 line_num)
     return offset;
 }
 
-// TODO 在文件末尾追加数据
-void plan::write(const QString &filename)
+bool plan::write(const QString &filename) const
 {
+    // 打开文件以追加方式写入日程信息
+    QFile file(filename);
+    if (file.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << this->to_string();
+        file.close();
+        return true;
+    }
+    return false;
+}
 
+QString plan::transcoding(const QString& string) {
+
+    // 对字符串进行转义
+    QString escapedString = string;
+
+    escapedString.replace("|", "\\|");
+
+    escapedString.replace("\n"," ");
+
+    return escapedString;
 }
