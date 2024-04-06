@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <numeric>
 #include <QSound>
+#include "allplan.h"
 calendar::calendar(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::calendar)
 {
@@ -33,7 +34,7 @@ calendar::calendar(QWidget *parent)
     connect(timer, &QTimer::timeout, this, &calendar::updateTimeLabel);
     timer->start(1000); // 每秒更新一次时间
     show_calendar();
-
+    connect(ui->all_plans, &QPushButton::clicked, this,&calendar::display_all_plans);
 
     timer_check_event = new QTimer(this);
 
@@ -53,14 +54,27 @@ calendar::calendar(QWidget *parent)
     read_plan_file();//读取日程文件
     // 创建几个 plan 对象并添加到 plans 容器中
     plans.push_back(plan(1, "Meeting", "Conference Room", "Discuss project timeline", QDateTime(QDate(2024, 4, 4), QTime(15, 21))));
-    plans.push_back(plan(2, "Lunch", "Cafeteria", "Meet with colleagues", QDateTime(QDate(2024, 4, 5), QTime(12, 0))));
-    plans.push_back(plan(3, "Gym", "Fitness Center", "Workout session", QDateTime(QDate(2024, 4, 5), QTime(18, 0))));
+    plans.push_back(plan(2, "Lunch", "Cafeteria", "Meet with colleagues", QDateTime(QDate(2026, 6, 5), QTime(12, 0))));
+    plans.push_back(plan(3, "Gym", "Fitness Center", "Workout session", QDateTime(QDate(2026, 4, 5), QTime(18, 0))));
+
 
     remind_window();
 }
+
+
+void calendar::display_all_plans(){
+    allplans_window=new Allplan;
+    sortPlans( plans, sort_plans);
+   // qDebug()<<sort_plans.size();
+    allplans_window->displays_plans( plans, sort_plans);
+    allplans_window->show();
+}
+
 void calendar::remind_window(){
      sortPlans( plans, sort_plans);
-
+if(sort_plans.size()==0){
+    return;
+}
     // 获取 sort_plans 中第一个元素的值
     int planIndex = sort_plans[0];
     // 获取当前时间
@@ -331,13 +345,14 @@ void calendar::sortPlans(QVector<plan> plans, QVector<int> &sortplants){
         std::sort(indices.begin(), indices.end(), [&](int i1, int i2) {
             return comparePlans(plans[i1], plans[i2]);
         });
-
+//qDebug()<<indices[0]<<indices[1];
         // 把排序后的索引（需要加1，因为id从1开始）存入sortplants
         for (int idx : indices) {
-                if (plans[idx].time.date() >= QDateTime::currentDateTime().date() &&
-                        plans[idx].time.time().toString("hh:mm") >= QDateTime::currentDateTime().time().toString("hh:mm")) {
+                if (plans[idx].time.date() >= QDateTime::currentDateTime().date() ||(plans[idx].time.date() == QDateTime::currentDateTime().date()&&
+                        plans[idx].time.time().hour() * 60 + plans[idx].time.time().minute() >= QDateTime::currentDateTime().time().hour() * 60
+                        + QDateTime::currentDateTime().time().minute() )) {
                     sortplants.push_back(idx + 1); // 下标加1变为id
-                   // qDebug()<<idx + 1<<" ";
+                    //qDebug()<<idx + 1<<" ";
                 }
             }
 }

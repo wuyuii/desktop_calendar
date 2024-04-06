@@ -7,7 +7,7 @@
 #include <QMap>
 #include<QTimer>
 #include "plan.h"
-
+#include "allplan.h"
 #include <QPushButton>
 #include <QLineEdit>
 #include <QTextEdit>
@@ -40,7 +40,7 @@ public:
     QString default_plan_filename;// 默认日程文件路径
     QTimer *timer;//定时器对象
     QTimer *timer_check_event;//定时器对象
-
+    Allplan *allplans_window;
     QVector<plan> plans;// 下标 + 1 对应 plan里的 id
     QVector<int> sort_plans;
     void show_calendar();
@@ -64,7 +64,7 @@ private slots:
     void updateTimeLabel();
     void closest_to_the_event();//测试弹窗用的，后面
     void remind_window();
-    //void
+    void display_all_plans();
 
 private:
     Ui::calendar *ui;

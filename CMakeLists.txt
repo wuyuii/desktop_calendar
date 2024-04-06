@@ -21,6 +21,7 @@ set(PROJECT_SOURCES
         calendar.ui
         plan.cpp plan.h
         res.qrc
+        allplan.cpp allplan.h allplan.ui
         lib/lunar.h lib/lunar.cpp)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
