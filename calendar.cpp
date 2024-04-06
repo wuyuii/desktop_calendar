@@ -7,7 +7,9 @@
 #include<QGraphicsDropShadowEffect>
 #include<QTimer>
 #include <QMessageBox>
-
+#include <numeric>
+#include <QSound>
+#include "allplan.h"
 calendar::calendar(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::calendar)
 {
@@ -15,7 +17,7 @@ calendar::calendar(QWidget *parent)
     cur_date = QDate::currentDate();
     selected_date = QDate::currentDate();
     plans = QVector<plan>();
-
+//   QSound *start_sound=new QSound(":/res/music.wav",this);
     connect(ui->pre_month_pushButton, &QPushButton::clicked, this, [=]() {
         date_clicked(selected_date.addMonths(-1));
     });
@@ -32,12 +34,12 @@ calendar::calendar(QWidget *parent)
     connect(timer, &QTimer::timeout, this, &calendar::updateTimeLabel);
     timer->start(1000); // 每秒更新一次时间
     show_calendar();
-
+    connect(ui->all_plans, &QPushButton::clicked, this,&calendar::display_all_plans);
 
     timer_check_event = new QTimer(this);
 
     // 连接定时器的timeout()信号到槽函数
-    connect(timer_check_event, &QTimer::timeout, this, &calendar::closest_to_the_event);
+    connect(timer_check_event, &QTimer::timeout, this, &calendar::remind_window);
 
     // 设置定时器间隔为1分钟
     timer_check_event->start(60000);
@@ -50,8 +52,53 @@ calendar::calendar(QWidget *parent)
     default_plan_filename = "../resources/plan.txt";
     connect(ui->add_plan_pushbutton, &QPushButton::clicked, this, &calendar::closest_to_the_event);
     read_plan_file();//读取日程文件
+    // 创建几个 plan 对象并添加到 plans 容器中
+    plans.push_back(plan(1, "Meeting", "Conference Room", "Discuss project timeline", QDateTime(QDate(2024, 4, 4), QTime(15, 21))));
+    plans.push_back(plan(2, "Lunch", "Cafeteria", "Meet with colleagues", QDateTime(QDate(2025, 6, 5), QTime(12, 0))));
+    plans.push_back(plan(3, "Gym", "Fitness Center", "Workout session", QDateTime(QDate(2025, 4, 5), QTime(18, 0))));
+
+
+    remind_window();
 }
 
+
+void calendar::display_all_plans(){
+    allplans_window=new Allplan;
+    sortPlans( plans, sort_plans);
+   // qDebug()<<sort_plans.size();
+    allplans_window->displays_plans( plans, sort_plans);
+    allplans_window->show();
+}
+
+void calendar::remind_window(){
+     sortPlans( plans, sort_plans);
+if(sort_plans.size()==0){
+    return;
+}
+    // 获取 sort_plans 中第一个元素的值
+    int planIndex = sort_plans[0];
+    // 获取当前时间
+    QDateTime currentTime = QDateTime::currentDateTime();
+    // 确保 plans 的索引有效
+    if(planIndex >= 1 && planIndex <= plans.size()) {
+        // 获取对应的 plan 对象
+    const plan& eventPlan = plans[planIndex - 1];
+        // 比较计划的时间和当前时间的年月日时分是否一样
+    if(eventPlan.time.date() == currentTime.date() && eventPlan.time.toString("hh:mm") == currentTime.toString("hh:mm")) {
+            // 将 plan 对象中的信息提取出来，放到提醒事件的窗口中
+        QSound* start_sound = new QSound(":/res/music.wav", this);
+                    start_sound->play();
+            QString title = eventPlan.title;
+            QString location = eventPlan.location;
+            QString information = eventPlan.information;
+            QDateTime time = eventPlan.time;
+
+            // 创建提醒事件的窗口
+            QMessageBox::information(this, "您有代办事情", QString("Title: %1\nLocation: %2\nInformation: %3\nTime: %4")
+                                     .arg(title).arg(location).arg(information).arg(time.toString()));
+        }
+    }
+}
 
 void calendar::closest_to_the_event()
 {
@@ -283,6 +330,32 @@ void calendar::read_plan_file()
     file.close(); // 关闭文件
 }
 
+void calendar::sortPlans(QVector<plan> plans, QVector<int> &sortplants){
+
+
+    // 清空sortplants以防万一里面有旧数据
+        sortplants.clear();
+        // 获取当前系统时间
+            QDateTime currentDateTime = QDateTime::currentDateTime();
+        // 创建一个索引数组，初试状态下为0, 1, 2, ... n
+        QVector<int> indices(plans.size());
+        std::iota(indices.begin(), indices.end(), 0); // 需要#include <numeric>
+
+        // 使用std::sort和自定义比较函数来排序索引
+        std::sort(indices.begin(), indices.end(), [&](int i1, int i2) {
+            return comparePlans(plans[i1], plans[i2]);
+        });
+//qDebug()<<indices[0]<<indices[1];
+        // 把排序后的索引（需要加1，因为id从1开始）存入sortplants
+        for (int idx : indices) {
+                if (plans[idx].time.date() >= QDateTime::currentDateTime().date() ||(plans[idx].time.date() == QDateTime::currentDateTime().date()&&
+                        plans[idx].time.time().hour() * 60 + plans[idx].time.time().minute() >= QDateTime::currentDateTime().time().hour() * 60
+                        + QDateTime::currentDateTime().time().minute() )) {
+                    sortplants.push_back(idx + 1); // 下标加1变为id
+                    //qDebug()<<idx + 1<<" ";
+                }
+            }
+}
 calendar::~calendar() {
     delete ui;
 }
