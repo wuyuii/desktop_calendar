@@ -126,19 +126,6 @@
      <string>全部日程</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="search_day_Button">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>130</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>查找日期</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -146,7 +133,7 @@
      <x>0</x>
      <y>0</y>
      <width>1118</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

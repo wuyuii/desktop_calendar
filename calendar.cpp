@@ -8,9 +8,11 @@
 #include<QTimer>
 #include <QMessageBox>
 #include <numeric>
-#include<QQDateDialog.h>
 #include <QSound>
 #include "allplan.h"
+
+#include <QCoreApplication>
+#include <QDir>
 calendar::calendar(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::calendar)
 {
@@ -48,11 +50,14 @@ calendar::calendar(QWidget *parent)
 
     int padding = 10; // 设置内边距大小
     ui->gridLayoutWidget->setContentsMargins(padding, padding, padding, padding);
-    connect(this->ui->search_day_Button, &QPushButton::clicked, this, &calendar::onSearchDayPushButtonClicked);
+
     //创建日程
-    default_plan_filename = "../resources/plan.txt";
+    QDir::setCurrent(QCoreApplication::applicationDirPath() + "/..");
+    default_plan_filename = "desktop_calendar/resources/plan.txt";//设置日程目录
     connect(ui->add_plan_pushbutton, &QPushButton::clicked, this, &calendar::closest_to_the_event);
     read_plan_file();//读取日程文件
+
+
     // 创建几个 plan 对象并添加到 plans 容器中
     plans.push_back(plan(1, "Meeting", "Conference Room", "Discuss project timeline", QDateTime(QDate(2024, 4, 4), QTime(15, 21))));
     plans.push_back(plan(2, "Lunch", "Cafeteria", "Meet with colleagues", QDateTime(QDate(2025, 6, 5), QTime(12, 0))));
@@ -201,18 +206,12 @@ void calendar::show_calendar()
 {
     // 清除之前创建的按钮
     clear_calendar();
-    QStringList weekdayLabels = {"一", "二", "三", "四", "五", "六", "七"};
-    for (int i = 0; i < 7; ++i) {
-        QLabel *weekdayLabel = new QLabel(weekdayLabels[i], this);
-        weekdayLabel->setAlignment(Qt::AlignCenter); // 居中对齐
-        weekdayLabel->setFixedHeight(20); // 设置固定高度
-        ui->gridLayout->addWidget(weekdayLabel, 0, i);
-    }
+
     QDate first_day_of_month = selected_date.addDays(-selected_date.day() + 1);//得到本月第一天的月、日
     int start_day = first_day_of_month.dayOfWeek(); // 获取当前月份的第一天是星期几
     int prev_month_days = start_day - 1;//本月有多少天不是本月里面的
     QDate tmp_date = selected_date.addDays(-selected_date.day() + 1 - prev_month_days);// 日历格中的第一个
-    for (int row = 1; row < 7; ++row)
+    for (int row = 0; row < 6; ++row)
     {
         for (int column = 0; column < 7; ++column)
         {
@@ -273,16 +272,7 @@ void calendar::date_clicked(const QDate &date)
     show_calendar();
 
 }
-//查找某一天
-void calendar::onSearchDayPushButtonClicked()
-{
 
-    QDateDialog dialog(this); // 假设存在一个名为 QDateDialog 的对话框类
-    if (dialog.exec() == QDialog::Accepted) {
-        QDate selectedDate = dialog.selectedDate();
-        date_clicked(selectedDate); // 调用原来的 date_clicked 函数处理选中日期的逻辑
-    }
-}
 void calendar::read_plan_file()
 {
     // 打开文件
