@@ -20,6 +20,8 @@ set(PROJECT_SOURCES
         calendar.h
         calendar.ui
         plan.cpp plan.h
+        QQDateDialog.cpp
+        QQDateDialog.h
         res.qrc
         allplan.cpp allplan.h allplan.ui
         lib/lunar.h lib/lunar.cpp)
