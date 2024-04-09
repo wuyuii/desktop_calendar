@@ -43,6 +43,8 @@ public:
      * 转义分隔符和换行符
      */
     static QString transcoding(const QString& string);
+    //修改日程
+    void modify(const QString& filename, qint64 line_num);
 };
 
 
