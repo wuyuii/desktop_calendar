@@ -52,7 +52,7 @@ public:
     bool comparePlans(const plan &a, const plan &b) {
         return a.time < b.time;
     }
-
+    void onSearchDayPushButtonClicked();//查找
     void sortPlans(QVector<plan> plans, QVector<int> &sortplants);
 
     //TODO 根据日期分类plan
