@@ -11,6 +11,8 @@
 #include<QQDateDialog.h>
 #include <QSound>
 #include "allplan.h"
+#include <QCoreApplication>
+#include <QDir>
 calendar::calendar(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::calendar)
 {
@@ -50,7 +52,8 @@ calendar::calendar(QWidget *parent)
     ui->gridLayoutWidget->setContentsMargins(padding, padding, padding, padding);
     connect(this->ui->search_day_Button, &QPushButton::clicked, this, &calendar::onSearchDayPushButtonClicked);
     //创建日程
-    default_plan_filename = "../resources/plan.txt";
+    QDir::setCurrent(QCoreApplication::applicationDirPath() + "/..");
+    default_plan_filename = "desktop_calendar/resources/plan.txt";//设置日程目录
     connect(ui->add_plan_pushbutton, &QPushButton::clicked, this, &calendar::closest_to_the_event);
     read_plan_file();//读取日程文件
     // 创建几个 plan 对象并添加到 plans 容器中
