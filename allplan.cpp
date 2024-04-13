@@ -27,23 +27,37 @@ void Allplan::displays_plans(QVector<plan> plans, QVector<int> &sortplants){
     }
     else{
        // 创建一个表格模型
-       QStandardItemModel *model = new QStandardItemModel(sortplants.size(), 4, this);
+        int row=0;
+          for (int i = 0; i < sortplants.size(); ++i) {
+              int id = sortplants[i];
+              plan myplan = plans[id - 1]; // id 从 1 开始，所以需要减去 1 获取正确的索引
+              if(myplan.delete_mask==0){
+                  row++;
+              }
+          }
+       QStandardItemModel *model = new QStandardItemModel(row, 4, this);
 
        // 设置表头
        model->setHorizontalHeaderLabels(QStringList() << "Time" << "Information" << "Location" << "Title");
 
        // 逐个将计划添加到表格中
+       int j=0;
        for (int i = 0; i < sortplants.size(); ++i) {
            int id = sortplants[i];
            plan myplan = plans[id - 1]; // id 从 1 开始，所以需要减去 1 获取正确的索引
-           model->setItem(i, 0, new QStandardItem(myplan.time.toString()));
-           model->setItem(i, 1, new QStandardItem(myplan.information));
-           model->setItem(i, 2, new QStandardItem(myplan.location));
-           model->setItem(i, 3, new QStandardItem(myplan.title));
+           if(myplan.delete_mask==0){
+           model->setItem(j, 0, new QStandardItem(myplan.time.toString()));
+           model->setItem(j, 1, new QStandardItem(myplan.information));
+           model->setItem(j, 2, new QStandardItem(myplan.location));
+           model->setItem(j, 3, new QStandardItem(myplan.title));
+           j++;
+           }
        }
 
        // 将模型设置给表格视图
        ui->plan_tableView->setModel(model);
+       // 设置表格视图的编辑模式为只读
+       ui->plan_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
        // 设置表头大小策略
        ui->plan_tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents); // 时间列固定大小
        ui->plan_tableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); // 信息列自动适应内容大小
