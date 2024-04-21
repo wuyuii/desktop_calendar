@@ -11,6 +11,7 @@
 #include<QQDateDialog.h>
 #include <QSound>
 #include "allplan.h"
+#include "lib/lunar.h"
 #include <QCoreApplication>
 #include <QDir>
 calendar::calendar(QWidget *parent)
@@ -219,8 +220,6 @@ void calendar::show_calendar()
     {
         for (int column = 0; column < 7; ++column)
         {
-            // TODO 暂时用QPushButton代替，可用其他组件实现个性化
-
 
             auto *button = new QPushButton(this);
             connect(button, &QPushButton::clicked, this, [=]() {
@@ -228,15 +227,19 @@ void calendar::show_calendar()
             });
             ui->gridLayout->addWidget(button, row, column);
 
+            auto lunar = new Lunar();
+            LunarObj* obj = lunar->solar2lunar(tmp_date.year(), tmp_date.month(), tmp_date.day());
+
             // 个性化日期显示效果
-            button->setText(QString::number(tmp_date.day()));
+            button->setText(QString::number(tmp_date.day()) + "\n" + QString::fromStdString(obj->lunarDayChineseName));
+
             button->setFixedSize(75, 75); // 按钮大小根据网格大小设定
 
             QString styleSheet = "QPushButton {"
                                  "    border-radius: 36px;" // 圆角半径固定为按钮高度的一半
-                                 "    padding: 10px;" // 内边距固定为20px
+                                 "    padding: 10px;" // 内边距固定为10px
                                  "}";
-            // 默认样式
+            // 非本月日期样式
             if (tmp_date.month() != selected_date.month())
             {
                 styleSheet += "QPushButton {"
