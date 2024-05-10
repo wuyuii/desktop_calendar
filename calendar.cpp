@@ -60,7 +60,7 @@ calendar::calendar(QWidget *parent)
     // 创建几个 plan 对象并添加到 plans 容器中
     plans.push_back(plan(1, "Meeting", "Conference Room", "Discuss project timeline", QDateTime(QDate(2024, 4, 13), QTime(20, 21))));
     plans.push_back(plan(2, "Lunch", "Cafeteria", "Meet with colleagues", QDateTime(QDate(2025, 6, 5), QTime(12, 0))));
-    plans.push_back(plan(3, "Gym", "Fitness Center", "Workout session", QDateTime(QDate(2025, 4, 5), QTime(18, 0))));
+    plans.push_back(plan(3, "健身房", "Fitness Center", "Workout session", QDateTime(QDate(2025, 4, 5), QTime(18, 0))));
    // plans[1].delete_mask=1;
 
     remind_window();

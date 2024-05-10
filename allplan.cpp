@@ -5,6 +5,7 @@
 #include<QStandardItemModel>
 #include<QDebug>
 #include<QComboBox>
+#include<QLabel>
 Allplan::Allplan(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Allplan)
@@ -19,10 +20,11 @@ Allplan::Allplan(QWidget *parent) :
     // 连接下拉框的信号到槽函数
         connect(ui->themeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
                 this, &Allplan::changeTheme);
-
+        connect(ui->search_Button, &QPushButton::clicked, this,&Allplan::search_Button_click);
         // 应用默认主题（黑夜）
         changeTheme(0);
-   // setupUiStyle();  // 应用样式
+        ui->search_lable->setStyleSheet("QLabel { color: red; }");
+
     resize(1200,800);
 
 }
@@ -31,8 +33,47 @@ Allplan::~Allplan()
 {
     delete ui;
 }
+
+void Allplan::search_Button_click() {
+    QString searchText = ui->lineEdit->text();  // 获取搜索框中的文本
+    if (searchText.isEmpty()) {
+        displays_plans( this_plans, this_sortplants);
+        return;  // 如果搜索框为空，则不执行任何操作
+    }
+
+    // 创建一个新的表格模型
+    QStandardItemModel *model = new QStandardItemModel(0, 4, this);
+    model->setHorizontalHeaderLabels(QStringList() << "Time" << "Information" << "Location" << "Title");
+
+    // 遍历排序后的计划数组
+    int j = 0;  // 行计数器
+    for (int id : this_sortplants) {
+        plan myplan = this_plans[id - 1]; // 假设ID从1开始，所以减1获取索引
+         //qDebug()<<searchText;
+        if (myplan.delete_mask == 0 && myplan.title.contains(searchText, Qt::CaseInsensitive)) {
+            // 如果标题包含搜索文本，并且该计划未被标记为删除
+            model->setItem(j, 0, new QStandardItem(myplan.time.toString()));
+            model->setItem(j, 1, new QStandardItem(myplan.information));
+            model->setItem(j, 2, new QStandardItem(myplan.location));
+            model->setItem(j, 3, new QStandardItem(myplan.title));
+            j++;  // 增加行数
+
+        }
+    }
+
+    // 将模型设置给表格视图
+    ui->plan_tableView->setModel(model);
+    ui->plan_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->plan_tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    ui->plan_tableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->plan_tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    ui->plan_tableView->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
+}
+
 void Allplan::displays_plans(QVector<plan> plans, QVector<int> &sortplants){
     // 判断是否有计划
+    this_plans = plans;
+    this_sortplants = sortplants;
     if (sortplants.empty()) {
         // 如果没有计划，显示"当前还有没要完成的日程"
         QStandardItemModel * model = new QStandardItemModel(1, 1, this);
@@ -114,6 +155,7 @@ void Allplan::changeTheme(int index) {
             QHeaderView { \
                 background-color: transparent; \
             } \
+            \
             QAbstractItemView { \
                 selection-background-color: #555; \
                 selection-color: #FFF; \
