@@ -1,5 +1,5 @@
 // qdatedialog.cpp
-#include "QQDateDialog.h"
+#include "QDateDialog.h"
 
 QDateDialog::QDateDialog(QWidget *parent) : QDialog(parent)
 {
