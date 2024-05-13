@@ -122,39 +122,55 @@ if(sort_plans.size()==0){
 
 void calendar::closest_to_the_event()
 {
-    // 创建一个对话框窗口
     QDialog dialog(this);
     dialog.setWindowTitle("添加日程");
-    dialog.setFixedSize(500, 600);
+    dialog.setFixedSize(400, 400); // 调整对话框大小
+
+    // 设置对话框背景图片
+    QPixmap bgImage(":/image/res/background1.jpg"); // 替换路径为实际图片路径
+    QPalette palette;
+    palette.setBrush(QPalette::Background, bgImage);
+    dialog.setPalette(palette);
 
     // 创建标签和文本框以输入标题
     auto *titleLabel = new QLabel("标题:", &dialog);
+    titleLabel->setFont(QFont("Arial", 10, QFont::Bold)); // 设置字体加粗
     auto *titleEdit = new QLineEdit(&dialog);
+    titleEdit->setStyleSheet("background-color: #f0f0f0; color: black; border: 1px solid black; border-radius: 10px;"); // 设置文本框背景色、边框、字体颜色和边角为圆角
 
     // 创建标签和文本框以输入地点
     auto *location_label = new QLabel("地点:", &dialog);
+    location_label->setFont(QFont("Arial", 10, QFont::Bold)); // 设置字体加粗
     auto *location_edit = new QLineEdit(&dialog);
+    location_edit->setStyleSheet("background-color: #f0f0f0; color: black; border: 1px solid black; border-radius: 10px;"); // 设置文本框背景色、边框、字体颜色和边角为圆角
 
     // 创建详细信息和文本框以输入详情
     auto *information_label = new QLabel("详细信息:", &dialog);
-    auto *information_edit = new QLineEdit(&dialog);
-    information_edit->setFixedSize(480, 100); // 设置文本框的宽度为 200
+    information_label->setFont(QFont("Arial", 10, QFont::Bold)); // 设置字体加粗
+    auto *information_edit = new QTextEdit(&dialog); // 使用 QTextEdit 替代 QLineEdit
+    information_edit->setFixedHeight(80); // 调整文本框的高度
+    information_edit->setStyleSheet("background-color: #f0f0f0; color: black; border: 1px solid black; border-radius: 10px;"); // 设置文本框背景色、边框、字体颜色和边角为圆角
+    information_edit->setTextInteractionFlags(Qt::TextEditorInteraction); // 设置文本框从第一行开始输入
 
     // 创建标签和日期时间编辑器以输入时间
     auto *timeLabel = new QLabel("时间:", &dialog);
-
+    timeLabel->setFont(QFont("Arial", 10, QFont::Bold)); // 设置字体加粗
     auto *timeEdit = new QDateTimeEdit(QDateTime::currentDateTime(), &dialog); // 设置默认时间为当前时间
 
     // 创建保存和取消按钮
     auto *saveButton = new QPushButton("保存", &dialog);
     auto *cancelButton = new QPushButton("取消", &dialog);
 
+    // 设置按钮样式
+    saveButton->setStyleSheet("background-color: #4CAF50; color: white; padding: 8px 16px;");
+    cancelButton->setStyleSheet("background-color: #f44336; color: white; padding: 8px 16px;");
+
     // 连接保存按钮的点击信号到 lambda 表达式
     connect(saveButton, &QPushButton::clicked, [&]() {
 
         QString title = titleEdit->text(); // 获取标题文本
         QString location = location_edit->text(); // 获取地点文本
-        QString information = information_edit->text(); // 获取详细信息文本
+        QString information = information_edit->toPlainText(); // 获取详细信息文本
         QDateTime time = timeEdit->dateTime(); // 获取日期时间
 
         plan cur_plan(plans.size() + 1, title, location, information, time);
@@ -173,6 +189,8 @@ void calendar::closest_to_the_event()
 
     // 创建布局并将各个部件添加到布局中
     auto *layout = new QVBoxLayout(&dialog);
+    layout->setSpacing(10); // 调整部件之间的间距
+    layout->setContentsMargins(50, 50, 50, 50); // 设置主边框与部件之间的距离
     layout->addWidget(titleLabel);
     layout->addWidget(titleEdit);
     layout->addWidget(location_label);
@@ -181,11 +199,17 @@ void calendar::closest_to_the_event()
     layout->addWidget(information_edit);
     layout->addWidget(timeLabel);
     layout->addWidget(timeEdit);
-    layout->addWidget(saveButton);
-    layout->addWidget(cancelButton);
+
+    // 创建水平布局来放置按钮
+    auto *buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget(saveButton);
+    buttonLayout->addWidget(cancelButton);
+    layout->addLayout(buttonLayout);
 
     dialog.setLayout(layout); // 设置对话框的布局
+
     dialog.exec(); // 显示对话框
+
 }
 
 // 更新时间标签的槽函数

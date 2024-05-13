@@ -2,4 +2,7 @@
     <qresource prefix="/music">
         <file>res/music.wav</file>
     </qresource>
+    <qresource prefix="/image">
+        <file>res/background1.jpg</file>
+    </qresource>
 </RCC>

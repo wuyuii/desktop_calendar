@@ -26,6 +26,7 @@ Allplan::Allplan(QWidget *parent) :
         ui->search_lable->setStyleSheet("QLabel { color: red; }");
 
     resize(1200,800);
+    setWindowTitle("总日程展示");
 
 }
 
