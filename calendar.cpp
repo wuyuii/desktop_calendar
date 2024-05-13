@@ -8,7 +8,7 @@
 #include<QTimer>
 #include <QMessageBox>
 #include <numeric>
-#include<QQDateDialog.h>
+#include<QDateDialog.h>
 #include <QSound>
 #include "allplan.h"
 #include "lib/lunar.h"
