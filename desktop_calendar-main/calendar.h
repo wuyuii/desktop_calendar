@@ -56,7 +56,7 @@ public:
     void sortPlans(QVector<plan> plans, QVector<int> &sortplants);
     void display_specific_date_plans(const QDate &date);
     void show_day_plans(const QVector<plan> &plans, const QVector<int> &sortplants, const QDate &selectedDate);
-    //TODO 根据日期分类plan
+    void deletePlan(int row);
 
 signals:
 

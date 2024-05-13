@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1118</width>
-    <height>743</height>
+    <width>1207</width>
+    <height>731</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -77,36 +77,36 @@
    <widget class="QPushButton" name="pre_month_pushButton">
     <property name="geometry">
      <rect>
-      <x>500</x>
+      <x>430</x>
       <y>130</y>
-      <width>41</width>
-      <height>41</height>
+      <width>60</width>
+      <height>30</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>上一月</string>
     </property>
    </widget>
    <widget class="QPushButton" name="next_month_pushButton">
     <property name="geometry">
      <rect>
-      <x>550</x>
+      <x>510</x>
       <y>130</y>
-      <width>41</width>
-      <height>41</height>
+      <width>60</width>
+      <height>30</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>下一月</string>
     </property>
    </widget>
    <widget class="QPushButton" name="add_plan_pushbutton">
     <property name="geometry">
      <rect>
-      <x>400</x>
+      <x>330</x>
       <y>130</y>
-      <width>75</width>
-      <height>31</height>
+      <width>80</width>
+      <height>30</height>
      </rect>
     </property>
     <property name="text">
@@ -116,10 +116,10 @@
    <widget class="QPushButton" name="all_plans">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>230</x>
       <y>130</y>
-      <width>71</width>
-      <height>31</height>
+      <width>80</width>
+      <height>30</height>
      </rect>
     </property>
     <property name="text">
@@ -129,10 +129,10 @@
    <widget class="QPushButton" name="search_day_Button">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>130</x>
       <y>130</y>
-      <width>93</width>
-      <height>28</height>
+      <width>80</width>
+      <height>30</height>
      </rect>
     </property>
     <property name="text">
@@ -144,9 +144,35 @@
      <rect>
       <x>620</x>
       <y>10</y>
-      <width>491</width>
+      <width>581</width>
       <height>631</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="delete_Button">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>610</y>
+      <width>581</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>删除该日程</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="refresh_Button">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>580</y>
+      <width>581</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>刷新</string>
     </property>
    </widget>
   </widget>
@@ -155,7 +181,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1118</width>
+     <width>1207</width>
      <height>26</height>
     </rect>
    </property>
