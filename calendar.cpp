@@ -11,6 +11,10 @@
 #include<QQDateDialog.h>
 #include <QSound>
 #include "allplan.h"
+#include "lib/lunar.h"
+#include<QStandardItemModel>
+#include <QCoreApplication>
+#include <QDir>
 calendar::calendar(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::calendar)
 {
@@ -50,15 +54,25 @@ calendar::calendar(QWidget *parent)
     ui->gridLayoutWidget->setContentsMargins(padding, padding, padding, padding);
     connect(this->ui->search_day_Button, &QPushButton::clicked, this, &calendar::onSearchDayPushButtonClicked);
     //创建日程
-    default_plan_filename = "../resources/plan.txt";
+    QDir::setCurrent(QCoreApplication::applicationDirPath() + "/..");
+    default_plan_filename = "desktop_calendar/resources/plan.txt";//设置日程目录
     connect(ui->add_plan_pushbutton, &QPushButton::clicked, this, &calendar::closest_to_the_event);
     read_plan_file();//读取日程文件
     // 创建几个 plan 对象并添加到 plans 容器中
-    plans.push_back(plan(1, "Meeting", "Conference Room", "Discuss project timeline", QDateTime(QDate(2024, 4, 4), QTime(15, 21))));
+    plans.push_back(plan(1, "Meeting", "Conference Room", "Discuss project timeline", QDateTime(QDate(2024, 4, 13), QTime(20, 21))));
     plans.push_back(plan(2, "Lunch", "Cafeteria", "Meet with colleagues", QDateTime(QDate(2025, 6, 5), QTime(12, 0))));
-    plans.push_back(plan(3, "Gym", "Fitness Center", "Workout session", QDateTime(QDate(2025, 4, 5), QTime(18, 0))));
-
-
+    plans.push_back(plan(3, "健身房", "Fitness Center", "Workout session", QDateTime(QDate(2025, 4, 5), QTime(18, 0))));
+   // plans[1].delete_mask=1;
+    connect(this->ui->delete_Button, &QPushButton::clicked, this, [=]() {
+            QModelIndexList selectedIndexes = ui->day_plans->selectionModel()->selectedRows();
+            if (!selectedIndexes.isEmpty()) {
+                deletePlan(selectedIndexes.first().row());
+            }
+        });
+    connect(this->ui->refresh_Button,&QPushButton::clicked,this,[=]()
+    {
+       show_calendar();
+    });
     remind_window();
 }
 
@@ -201,7 +215,7 @@ void calendar::show_calendar()
 {
     // 清除之前创建的按钮
     clear_calendar();
-    QStringList weekdayLabels = {"一", "二", "三", "四", "五", "六", "七"};
+    QStringList weekdayLabels = {"一", "二", "三", "四", "五", "六", "日"};
     for (int i = 0; i < 7; ++i) {
         QLabel *weekdayLabel = new QLabel(weekdayLabels[i], this);
         weekdayLabel->setAlignment(Qt::AlignCenter); // 居中对齐
@@ -216,8 +230,6 @@ void calendar::show_calendar()
     {
         for (int column = 0; column < 7; ++column)
         {
-            // TODO 暂时用QPushButton代替，可用其他组件实现个性化
-
 
             auto *button = new QPushButton(this);
             connect(button, &QPushButton::clicked, this, [=]() {
@@ -225,15 +237,19 @@ void calendar::show_calendar()
             });
             ui->gridLayout->addWidget(button, row, column);
 
+            auto lunar = new Lunar();
+            LunarObj* obj = lunar->solar2lunar(tmp_date.year(), tmp_date.month(), tmp_date.day());
+
             // 个性化日期显示效果
-            button->setText(QString::number(tmp_date.day()));
+            button->setText(QString::number(tmp_date.day()) + "\n" + QString::fromStdString(obj->lunarDayChineseName));
+
             button->setFixedSize(75, 75); // 按钮大小根据网格大小设定
 
             QString styleSheet = "QPushButton {"
                                  "    border-radius: 36px;" // 圆角半径固定为按钮高度的一半
-                                 "    padding: 10px;" // 内边距固定为20px
+                                 "    padding: 10px;" // 内边距固定为10px
                                  "}";
-            // 默认样式
+            // 非本月日期样式
             if (tmp_date.month() != selected_date.month())
             {
                 styleSheet += "QPushButton {"
@@ -264,6 +280,10 @@ void calendar::show_calendar()
     }
 
     ui->selected_date_label->setText(QString("%1 年 %2 月 ").arg(selected_date.year()).arg(selected_date.month()));
+    // 调用 sortPlans 函数对日程进行排序
+    sortPlans(plans, sort_plans);
+    // 调用 show_day_plans 函数显示当天的日程
+    show_day_plans(plans, sort_plans, selected_date);
 }
 
 
@@ -372,6 +392,95 @@ void calendar::sortPlans(QVector<plan> plans, QVector<int> &sortplants){
                 }
             }
 }
+// 在 calendar 类中添加一个方法来显示日程表
+void calendar::show_day_plans(const QVector<plan> &plans, const QVector<int> &sortplants, const QDate &selectedDate)
+{
+    // 创建一个表格模型用于显示日程信息
+    QStandardItemModel *model = new QStandardItemModel(0, 4, this); // 设置初始行数为0
+
+    // 设置表头
+    model->setHorizontalHeaderLabels(QStringList() << "Time" << "Information" << "Location" << "Title");
+
+    // 遍历所有计划，筛选出当天的计划并添加到表格模型中
+    for (int i = 0; i < sortplants.size(); ++i) {
+        int id = sortplants[i];
+        const plan &myplan = plans[id - 1]; // id 从 1 开始，所以需要减去 1 获取正确的索引
+
+        // 检查计划是否是选中日期的
+        if (myplan.time.date() == selectedDate) {
+            // 在表格模型中添加该日程
+            int row = model->rowCount(); // 获取当前行数
+            model->insertRow(row); // 插入新行
+
+            // 添加日程信息到对应的单元格
+            model->setItem(row, 0, new QStandardItem(myplan.time.toString()));
+            model->setItem(row, 1, new QStandardItem(myplan.information));
+            model->setItem(row, 2, new QStandardItem(myplan.location));
+            model->setItem(row, 3, new QStandardItem(myplan.title));
+            QPushButton *delete_Button = new QPushButton("Delete");
+                        connect(delete_Button, &QPushButton::clicked, [=]() {
+                            deletePlan(row); // 调用删除日程的槽函数
+                        });
+        ui->day_plans->setIndexWidget(model->index(row, 4), delete_Button); // 将删除按钮添加到表格中
+        }
+    }
+
+    // 根据时间排序表格模型中的行
+    model->sort(0); // 按第一列（时间）排序
+
+    // 将模型设置给表格视图
+    ui->day_plans->setModel(model);
+    // 设置表头大小策略
+    ui->day_plans->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents); // 时间列固定大小
+    ui->day_plans->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); // 信息列自动适应内容大小
+    ui->day_plans->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch); // 地点列自动适应内容大小
+    ui->day_plans->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch); // 标题列自动适应内容大小
+
+    QString styleSheet = "QTableView {"
+                         "    background-color: #f0f0f0;" // 设置背景色
+                         "    border: 1px solid #ccc;" // 设置边框
+                         "}"
+                         "QTableView::item {"
+                         "    padding: 5px;" // 设置内边距
+                         "}"
+                         "QTableView::item:selected {"
+                         "    background-color: #a0c6e3;" // 设置选中行的背景色
+                         "}"
+                         "QHeaderView::section {"
+                         "    background-color: #d3d3d3;" // 设置表头的背景色
+                         "    color: #333;" // 设置表头文字颜色
+                         "    padding: 5px;" // 设置表头内边距
+                         "}";
+
+    ui->day_plans->setStyleSheet(styleSheet);
+    // 添加交互效果
+    ui->day_plans->setSelectionBehavior(QAbstractItemView::SelectRows); // 设置选中整行
+    ui->day_plans->setSelectionMode(QAbstractItemView::SingleSelection); // 设置单选模式
+    ui->day_plans->setEditTriggers(QAbstractItemView::NoEditTriggers); // 禁止编辑
+
+}
+void calendar::deletePlan(int row)
+{
+    if (row < 0 || row >= ui->day_plans->model()->rowCount()) {
+        return;
+    }
+
+    // 获取排序后的日程索引
+    int planIndex = sort_plans[row];
+
+    if (planIndex >= 1 && planIndex <= plans.size()) {
+        // 删除对应的日程
+        plans.remove(planIndex - 1);
+
+        // 更新 sort_plans 数组
+        sort_plans.remove(row);
+
+        // 重新显示日程
+        show_day_plans(plans, sort_plans, selected_date);
+    }
+}
+
+
 calendar::~calendar() {
     delete ui;
 }
