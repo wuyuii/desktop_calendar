@@ -12,7 +12,9 @@
 #include <QSound>
 #include "allplan.h"
 #include "lib/lunar.h"
+
 #include<QStandardItemModel>
+
 #include <QCoreApplication>
 #include <QDir>
 calendar::calendar(QWidget *parent)
@@ -63,6 +65,7 @@ calendar::calendar(QWidget *parent)
     plans.push_back(plan(2, "Lunch", "Cafeteria", "Meet with colleagues", QDateTime(QDate(2025, 6, 5), QTime(12, 0))));
     plans.push_back(plan(3, "健身房", "Fitness Center", "Workout session", QDateTime(QDate(2025, 4, 5), QTime(18, 0))));
    // plans[1].delete_mask=1;
+
     connect(this->ui->delete_Button, &QPushButton::clicked, this, [=]() {
             QModelIndexList selectedIndexes = ui->day_plans->selectionModel()->selectedRows();
             if (!selectedIndexes.isEmpty()) {
@@ -73,6 +76,8 @@ calendar::calendar(QWidget *parent)
     {
        show_calendar();
     });
+
+
     remind_window();
 }
 
