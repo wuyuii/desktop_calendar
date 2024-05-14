@@ -6,10 +6,8 @@
 #include<QDebug>
 #include<QComboBox>
 #include<QLabel>
-Allplan::Allplan(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::Allplan)
-{
+
+Allplan::Allplan(QWidget *parent) : QMainWindow(parent), ui(new Ui::Allplan) {
     ui->setupUi(this);
     ui->themeSelector->addItem("黑夜");
     ui->themeSelector->addItem("白昼");
@@ -19,39 +17,37 @@ Allplan::Allplan(QWidget *parent) :
     ui->themeSelector->addItem("自然");
     ui->themeSelector->setCurrentIndex(2);
     // 连接下拉框的信号到槽函数
-        connect(ui->themeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
-                this, &Allplan::changeTheme);
-        connect(ui->search_Button, &QPushButton::clicked, this,&Allplan::search_Button_click);
-        // 应用默认主题（黑夜）
-        changeTheme(2);
-        ui->search_lable->setStyleSheet("QLabel { color: red; }");
+    connect(ui->themeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Allplan::changeTheme);
+    connect(ui->search_Button, &QPushButton::clicked, this, &Allplan::search_Button_click);
+    // 应用默认主题（黑夜）
+    changeTheme(2);
+    ui->search_lable->setStyleSheet("QLabel { color: red; }");
 
-    resize(1200,800);
+    resize(1200, 800);
     setWindowTitle("总日程展示");
 
 }
 
-Allplan::~Allplan()
-{
+Allplan::~Allplan() {
     delete ui;
 }
 
 void Allplan::search_Button_click() {
     QString searchText = ui->lineEdit->text();  // 获取搜索框中的文本
     if (searchText.isEmpty()) {
-        displays_plans( this_plans, this_sortplants);
+        displays_plans(this_plans, this_sortplants);
         return;  // 如果搜索框为空，则不执行任何操作
     }
 
     // 创建一个新的表格模型
-    QStandardItemModel *model = new QStandardItemModel(0, 4, this);
+    auto *model = new QStandardItemModel(0, 4, this);
     model->setHorizontalHeaderLabels(QStringList() << "Time" << "Title" << "Location" << "Information");
 
     // 遍历排序后的计划数组
     int j = 0;  // 行计数器
-    for (int id : this_sortplants) {
+    for (int id: this_sortplants) {
         plan myplan = this_plans[id - 1]; // 假设ID从1开始，所以减1获取索引
-         //qDebug()<<searchText;
+        //qDebug()<<searchText;
         if (myplan.delete_mask == 0 && myplan.title.contains(searchText, Qt::CaseInsensitive)) {
             // 如果标题包含搜索文本，并且该计划未被标记为删除
             QString formattedTime = myplan.time.toString("dddd yyyy-MM-dd HH:mm"); // 使用指定格式显示时间，包括星期几
@@ -73,60 +69,55 @@ void Allplan::search_Button_click() {
     ui->plan_tableView->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
 }
 
-void Allplan::displays_plans(QVector<plan> plans, QVector<int> &sortplants){
+void Allplan::displays_plans(QVector<plan> plans, QVector<int> &sortplants) {
     // 判断是否有计划
     this_plans = plans;
     this_sortplants = sortplants;
     if (sortplants.empty()) {
         // 如果没有计划，显示"当前还有没要完成的日程"
-        QStandardItemModel * model = new QStandardItemModel(1, 1, this);
+        auto *model = new QStandardItemModel(1, 1, this);
         model->setItem(0, 0, new QStandardItem("当前没有日程"));
-         ui->plan_tableView->setModel(model);
+        ui->plan_tableView->setModel(model);
+    } else {
+        // 创建一个表格模型
+        int row = 0;
+        for (int id : sortplants) {
+            plan myplan = plans[id - 1]; // id 从 1 开始，所以需要减去 1 获取正确的索引
+            if (myplan.delete_mask == 0) {
+                row++;
+            }
+        }
+        auto *model = new QStandardItemModel(row, 4, this);
+
+        // 设置表头
+        model->setHorizontalHeaderLabels(QStringList() << "Time" << "Title" << "Location" << "Information");
+
+        // 逐个将计划添加到表格中
+        int j = 0;
+        for (int id : sortplants) {
+            plan myplan = plans[id - 1]; // id 从 1 开始，所以需要减去 1 获取正确的索引
+            if (myplan.delete_mask == 0) {
+                QString formattedTime = myplan.time.toString("dddd yyyy-MM-dd HH:mm"); // 使用指定格式显示时间，包括星期几
+                model->setItem(j, 0, new QStandardItem(formattedTime));
+                model->setItem(j, 1, new QStandardItem(myplan.title));
+                model->setItem(j, 2, new QStandardItem(myplan.location));
+                model->setItem(j, 3, new QStandardItem(myplan.information));
+                j++;
+            }
+        }
+
+        // 将模型设置给表格视图
+        ui->plan_tableView->setModel(model);
+        // 设置表格视图的编辑模式为只读
+        ui->plan_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        // 设置表头大小策略
+        ui->plan_tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents); // 时间列固定大小
+        ui->plan_tableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); // 信息列自动适应内容大小
+        ui->plan_tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch); // 地点列自动适应内容大小
+        ui->plan_tableView->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch); // 标题列自动适应内容大小
     }
-    else{
-       // 创建一个表格模型
-        int row=0;
-          for (int i = 0; i < sortplants.size(); ++i) {
-              int id = sortplants[i];
-              plan myplan = plans[id - 1]; // id 从 1 开始，所以需要减去 1 获取正确的索引
-              if(myplan.delete_mask==0){
-                  row++;
-              }
-          }
-       QStandardItemModel *model = new QStandardItemModel(row, 4, this);
-
-       // 设置表头
-       model->setHorizontalHeaderLabels(QStringList() << "Time" << "Title" << "Location" << "Information");
-
-       // 逐个将计划添加到表格中
-       int j=0;
-       for (int i = 0; i < sortplants.size(); ++i) {
-           int id = sortplants[i];
-           plan myplan = plans[id - 1]; // id 从 1 开始，所以需要减去 1 获取正确的索引
-           if(myplan.delete_mask==0){
-            QString formattedTime = myplan.time.toString("dddd yyyy-MM-dd HH:mm"); // 使用指定格式显示时间，包括星期几
-           model->setItem(j, 0, new QStandardItem(formattedTime));
-           model->setItem(j, 1, new QStandardItem(myplan.title));
-           model->setItem(j, 2, new QStandardItem(myplan.location));
-           model->setItem(j, 3, new QStandardItem(myplan.information));
-           j++;
-           }
-       }
-
-       // 将模型设置给表格视图
-       ui->plan_tableView->setModel(model);
-       // 设置表格视图的编辑模式为只读
-       ui->plan_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-       // 设置表头大小策略
-       ui->plan_tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents); // 时间列固定大小
-       ui->plan_tableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); // 信息列自动适应内容大小
-       ui->plan_tableView->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch); // 地点列自动适应内容大小
-       ui->plan_tableView->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch); // 标题列自动适应内容大小
-}
 
 }
-
-
 
 
 void Allplan::changeTheme(int index) {

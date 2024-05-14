@@ -55,7 +55,7 @@ calendar::calendar(QWidget *parent) : QMainWindow(parent), ui(new Ui::calendar) 
 
     // 设置定时器间隔为1分钟
     timer_check_event->start(40000);
-   // remind_window();
+
     int padding = 10; // 设置内边距大小
     ui->gridLayoutWidget->setContentsMargins(padding, padding, padding, padding);
     connect(this->ui->search_day_Button, &QPushButton::clicked, this, &calendar::onSearchDayPushButtonClicked);
@@ -90,7 +90,7 @@ void calendar::display_all_plans() {
 void calendar::remind_window() {
     sortPlans(plans, sort_plans);
 
-    if (sort_plans.size() == 0) {
+    if (sort_plans.empty()) {
         return;
     }
 
@@ -98,15 +98,16 @@ void calendar::remind_window() {
     QDateTime currentTime = QDateTime::currentDateTime();
 
     // 遍历排序后的计划数组
-    for (int planIndex : sort_plans) {
+    for (int planIndex: sort_plans) {
         // 确保 plans 的索引有效
         if (planIndex >= 1 && planIndex <= plans.size()) {
             // 获取对应的 plan 对象
-            const plan& eventPlan = plans[planIndex - 1];
+            const plan &eventPlan = plans[planIndex - 1];
 
 
             // 比较计划的时间和当前时间的年月日时分是否一样
-            if (eventPlan.time.date() == currentTime.date() && eventPlan.time.toString("hh:mm") == currentTime.toString("hh:mm")) {
+            if (eventPlan.time.date() == currentTime.date() &&
+                eventPlan.time.toString("hh:mm") == currentTime.toString("hh:mm")) {
                 // 将 plan 对象中的信息提取出来，放到提醒事件的窗口中
 
                 QSound::play(":/music/res/music_plus.wav");
@@ -114,11 +115,12 @@ void calendar::remind_window() {
                 QString location = eventPlan.location;
                 QString information = eventPlan.information;
                 QDateTime time = eventPlan.time;
-              //  qDebug() << "asdasdasd";
+                //  qDebug() << "asdasdasd";
 
                 // 创建提醒事件的窗口
-                QMessageBox::information(this, "您有代办事情", QString("Title: %1\nLocation: %2\nInformation: %3\nTime: %4")
-                                         .arg(title).arg(location).arg(information).arg(time.toString()));
+                QMessageBox::information(this, "您有代办事情",
+                                         QString("Title: %1\nLocation: %2\nInformation: %3\nTime: %4").arg(title).arg(
+                                                 location).arg(information).arg(time.toString()));
                 break;  // 找到匹配的计划后跳出循环
             }
         }
