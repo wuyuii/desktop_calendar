@@ -1,12 +1,10 @@
-// qdatedialog.cpp
 #include "QDateDialog.h"
 
-QDateDialog::QDateDialog(QWidget *parent) : QDialog(parent)
-{
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+QDateDialog::QDateDialog(QWidget *parent) : QDialog(parent) {
+    auto *mainLayout = new QVBoxLayout(this);
     dateEdit = new QDateEdit(QDate::currentDate(), this);
 
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    auto *buttonLayout = new QHBoxLayout;
     okButton = new QPushButton("确定", this);
     cancelButton = new QPushButton("取消", this);
 
@@ -20,18 +18,15 @@ QDateDialog::QDateDialog(QWidget *parent) : QDialog(parent)
     connect(cancelButton, &QPushButton::clicked, this, &QDateDialog::onCancelButtonClicked);
 }
 
-QDate QDateDialog::selectedDate() const
-{
+QDate QDateDialog::selectedDate() const {
     return selected;
 }
 
-void QDateDialog::onOkButtonClicked()
-{
+void QDateDialog::onOkButtonClicked() {
     selected = dateEdit->date();
     accept(); // 发送 accepted 信号，表示对话框被接受
 }
 
-void QDateDialog::onCancelButtonClicked()
-{
+void QDateDialog::onCancelButtonClicked() {
     reject(); // 发送 rejected 信号，表示对话框被拒绝
 }

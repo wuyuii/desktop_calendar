@@ -23,16 +23,17 @@
 #include <QTextStream>
 #include <QDateTimeEdit>
 #include <algorithm>
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class calendar; }
 QT_END_NAMESPACE
 
-class calendar : public QMainWindow
-{
-    Q_OBJECT
+class calendar : public QMainWindow {
+Q_OBJECT
 
 public:
     explicit calendar(QWidget *parent = nullptr);
+
     ~calendar() override;
 
     QDate cur_date;// 当前日期
@@ -49,26 +50,36 @@ public:
     void clear_calendar();
 
     void read_plan_file();
+
     // 比较两个计划时间的函数
     static bool comparePlans(const plan &a, const plan &b) {
         return a.time < b.time;
     }
+
     void onSearchDayPushButtonClicked();//查找
     void sortPlans(QVector<plan> curPlans, QVector<int> &sortplants);
+
     void display_specific_date_plans(const QDate &date);
+
     void show_day_plans(const QVector<plan> &curPlans, const QVector<int> &sortplants, const QDate &selectedDate);
+
     void deletePlan(int row);
 
 signals:
 
 private slots:
+
     void date_clicked(const QDate &date);
+
     void updateTimeLabel();
+
     void closest_to_the_event();//测试弹窗用的，后面
     void remind_window();
+
     void display_all_plans();
 
 private:
     Ui::calendar *ui;
 };
+
 #endif // CALENDAR_H

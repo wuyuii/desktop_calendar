@@ -12,7 +12,6 @@
 class plan {
 
 public:
-    // TODO 如果title 或 location 包含 换行符 ，则需要转义 文本中的换行符
 
     size_t id; // 从 1 开始自增
     QString title;
@@ -28,23 +27,24 @@ public:
 
     QString to_string() const;
 
-    qint64 seek_offset(const QString& filename, qint64 offset);
+    qint64 seek_offset(const QString &filename, qint64 offset);
 
-    bool write(const QString& filename) const;
+    bool write(const QString &filename) const;
 
-    void update(const QString& filename, qint64 offset);
+    void update(const QString &filename, qint64 offset);
 
     /**
      * 废弃日程
      */
-    void drop(const QString& filename, qint64 line_num);
+    void drop(const QString &filename, qint64 line_num);
 
     /**
      * 转义分隔符和换行符
      */
-    static QString transcoding(const QString& string);
+    static QString transcoding(const QString &string);
+
     //修改日程
-    void modify(const QString& filename, qint64 line_num);
+    void modify(const QString &filename, qint64 line_num);
 };
 
 

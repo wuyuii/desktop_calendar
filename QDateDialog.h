@@ -1,4 +1,3 @@
-// qdatedialog.h
 #ifndef QDATEDIALOG_H
 #define QDATEDIALOG_H
 
@@ -9,12 +8,12 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-class QDateDialog : public QDialog
-{
-    Q_OBJECT
+class QDateDialog : public QDialog {
+Q_OBJECT
 
 public:
     explicit QDateDialog(QWidget *parent = nullptr);
+
     QDate selectedDate() const;
 
 private:
@@ -24,7 +23,9 @@ private:
     QDate selected;
 
 private slots:
+
     void onOkButtonClicked();
+
     void onCancelButtonClicked();
 };
 

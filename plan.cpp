@@ -13,23 +13,27 @@
 #include <QException> // 异常类的头文件
 #include <QDebug>
 
-const QString plan::DELIMITER  = "|";
+const QString plan::DELIMITER = "|";
 
-plan::plan(){}
+plan::plan() {}
 
-plan::plan(size_t id , QString title, QString location, QString information, QDateTime time)
-        : id(id), title(std::move(title)), location(std::move(location)), information(std::move(information)), time(std::move(time))
-        {
+plan::plan(size_t id, QString title, QString location, QString information, QDateTime time) : id(id),
+                                                                                              title(std::move(title)),
+                                                                                              location(std::move(
+                                                                                                      location)),
+                                                                                              information(std::move(
+                                                                                                      information)),
+                                                                                              time(std::move(time)) {
     delete_mask = 0;
 }
 
-QString plan::to_string() const
-{
-    return time.toString( (delete_mask ? '1' : '0') + transcoding(title) + DELIMITER + transcoding(location) + DELIMITER + transcoding(information) + DELIMITER + "yyyy-MM-dd hh:mm") + "\n";
+QString plan::to_string() const {
+    return time.toString(
+            (delete_mask ? '1' : '0') + transcoding(title) + DELIMITER + transcoding(location) + DELIMITER +
+            transcoding(information) + DELIMITER + "yyyy-MM-dd hh:mm") + "\n";
 }
 
-void plan::update(const QString& filename, qint64 offset)
-{
+void plan::update(const QString &filename, qint64 offset) {
     QFile file(filename); // 创建文件对象
     if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) // 以读写文本方式打开文件，检查是否成功打开文件
     {
@@ -49,11 +53,11 @@ void plan::update(const QString& filename, qint64 offset)
 
     file.close(); // 关闭文件
 }
+
 //删除日程
-void plan::drop(const QString &filename, qint64 line_num)
-{
+void plan::drop(const QString &filename, qint64 line_num) {
     delete_mask = 1;
-    qint64 offset = seek_offset(filename,line_num);
+    qint64 offset = seek_offset(filename, line_num);
     QFile file(filename); // 创建文件对象
     if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) // 以读写文本方式打开文件，检查是否成功打开文件
     {
@@ -79,9 +83,9 @@ void plan::drop(const QString &filename, qint64 line_num)
 
     file.close(); // 关闭文件
 }
+
 //查找偏移量
-qint64 plan::seek_offset(const QString& filename, qint64 line_num)
-{
+qint64 plan::seek_offset(const QString &filename, qint64 line_num) {
 
     QFile file(filename); // 创建文件对象
     if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) // 以读写文本方式打开文件，检查是否成功打开文件
@@ -93,8 +97,7 @@ qint64 plan::seek_offset(const QString& filename, qint64 line_num)
     QTextStream in(&file); // 创建文本流对象，用于从文件中读取数据
 
     // 跳过前面的行
-    for (int i = 1; i < line_num; ++i)
-    {
+    for (int i = 1; i < line_num; ++i) {
         if (in.atEnd()) // 如果已经到达文件末尾
         {
             throw std::out_of_range("行数超出文件实际行数");
@@ -108,10 +111,10 @@ qint64 plan::seek_offset(const QString& filename, qint64 line_num)
     file.close(); // 关闭文件
     return offset; // 返回行首偏移量
 }
+
 //修改日程
-void plan::modify(const QString& filename, qint64 line_num)
-{
-    qint64 offset = seek_offset(filename,line_num);
+void plan::modify(const QString &filename, qint64 line_num) {
+    qint64 offset = seek_offset(filename, line_num);
 
     QFile file(filename); // 创建文件对象
     if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) // 以读写文本方式打开文件，检查是否成功打开文件
@@ -129,10 +132,9 @@ void plan::modify(const QString& filename, qint64 line_num)
 
     file.close();
 }
+
 //写入日程
-bool plan::write(const QString &filename) const
-{
-    std::cout << filename.toStdString() << "\n";
+bool plan::write(const QString &filename) const {
     // 打开文件以追加方式写入日程信息
     QFile file(filename);
     if (file.open(QIODevice::Append | QIODevice::Text)) {
@@ -144,14 +146,14 @@ bool plan::write(const QString &filename) const
     return false;
 }
 
-QString plan::transcoding(const QString& string) {
+QString plan::transcoding(const QString &string) {
 
     // 对字符串进行转义
     QString escapedString = string;
 
     escapedString.replace("|", "\\|");
 
-    escapedString.replace("\n"," ");
+    escapedString.replace("\n", " ");
 
     return escapedString;
 }
