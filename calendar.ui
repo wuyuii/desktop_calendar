@@ -6,55 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1207</width>
+    <width>1400</width>
     <height>731</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>calendar</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="widget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>10</y>
-      <width>581</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <widget class="QLabel" name="time_label">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>10</y>
-       <width>541</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="date_label">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>60</y>
-       <width>541</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-    </widget>
-   </widget>
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>180</y>
+      <x>610</x>
+      <y>40</y>
       <width>535</width>
       <height>460</height>
      </rect>
@@ -64,11 +31,20 @@
    <widget class="QLabel" name="selected_date_label">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>130</y>
+      <x>120</x>
+      <y>150</y>
       <width>221</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+
+background:transparent;
+
+color: rgb(0, 0, 0);
+
+font: 75 15pt &quot;Fixedsys&quot;;</string>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -77,11 +53,19 @@
    <widget class="QPushButton" name="pre_month_pushButton">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>130</y>
-      <width>60</width>
+      <x>110</x>
+      <y>410</y>
+      <width>161</width>
       <height>30</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+background:transparent;
+
+color: rgb(0, 0, 0);
+font: 14pt &quot;华文彩云&quot;;
+</string>
     </property>
     <property name="text">
      <string>上一月</string>
@@ -90,11 +74,19 @@
    <widget class="QPushButton" name="next_month_pushButton">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>130</y>
-      <width>60</width>
+      <x>110</x>
+      <y>470</y>
+      <width>161</width>
       <height>30</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+background:transparent;
+
+color: rgb(0, 0, 0);
+font: 14pt &quot;华文彩云&quot;;
+</string>
     </property>
     <property name="text">
      <string>下一月</string>
@@ -103,11 +95,19 @@
    <widget class="QPushButton" name="add_plan_pushbutton">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>130</y>
-      <width>80</width>
+      <x>110</x>
+      <y>350</y>
+      <width>161</width>
       <height>30</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+background:transparent;
+
+color: rgb(0, 0, 0);
+font: 14pt &quot;华文彩云&quot;;
+</string>
     </property>
     <property name="text">
      <string>添加日程</string>
@@ -116,11 +116,19 @@
    <widget class="QPushButton" name="all_plans">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>130</y>
-      <width>80</width>
+      <x>110</x>
+      <y>290</y>
+      <width>161</width>
       <height>30</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+background:transparent;
+
+color: rgb(0, 0, 0);
+font: 14pt &quot;华文彩云&quot;;
+</string>
     </property>
     <property name="text">
      <string>全部日程</string>
@@ -129,11 +137,19 @@
    <widget class="QPushButton" name="search_day_Button">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>130</y>
-      <width>80</width>
+      <x>110</x>
+      <y>220</y>
+      <width>151</width>
       <height>30</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+background:transparent;
+
+color: rgb(0, 0, 0);
+font: 14pt &quot;华文彩云&quot;;
+</string>
     </property>
     <property name="text">
      <string>查找日期</string>
@@ -142,21 +158,35 @@
    <widget class="QTableView" name="day_plans">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>10</y>
-      <width>581</width>
-      <height>631</height>
+      <x>500</x>
+      <y>520</y>
+      <width>451</width>
+      <height>141</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background:transparent;
+background-color: rgb(255, 255, 255);</string>
     </property>
    </widget>
    <widget class="QPushButton" name="delete_Button">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>1030</x>
       <y>610</y>
-      <width>581</width>
-      <height>28</height>
+      <width>121</width>
+      <height>51</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+
+
+background-color: rgb(255, 170, 127);
+
+font: 14pt &quot;华文彩云&quot;;
+
+COLOR:rgb(0, 0, 0);</string>
     </property>
     <property name="text">
      <string>删除该日程</string>
@@ -165,28 +195,81 @@
    <widget class="QPushButton" name="refresh_Button">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>580</y>
-      <width>581</width>
-      <height>28</height>
+      <x>1060</x>
+      <y>530</y>
+      <width>81</width>
+      <height>51</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+
+
+background-color: rgb(255, 170, 127);
+
+font: 14pt &quot;华文彩云&quot;;
+
+COLOR:rgb(0, 0, 0);</string>
     </property>
     <property name="text">
      <string>刷新</string>
     </property>
    </widget>
+   <widget class="QLabel" name="time_label">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>60</y>
+      <width>541</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+
+background:transparent;
+
+
+
+
+font: 36pt &quot;Segoe Script&quot;;</string>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="date_label">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>100</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+
+background:transparent;
+
+font: 12pt &quot;MV Boli&quot;;</string>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1207</width>
-     <height>26</height>
-    </rect>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:transparent;</string>
+   </property>
+   <property name="sizeGripEnabled">
+    <bool>true</bool>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

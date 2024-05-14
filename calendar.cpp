@@ -12,19 +12,25 @@
 #include <QSound>
 #include "allplan.h"
 #include "lib/lunar.h"
-
+#include <QPixmap>
 #include<QStandardItemModel>
-
 #include <QCoreApplication>
 #include <QDir>
+
 calendar::calendar(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::calendar)
 {
     ui->setupUi(this);
+    // 设置窗口背景图片
+    QPixmap background(":/image/res/background3.png");
+    QPalette palette;
+    palette.setBrush(this->backgroundRole(), QBrush(background));
+    this->setPalette(palette);
+
     cur_date = QDate::currentDate();
     selected_date = QDate::currentDate();
     plans = QVector<plan>();
-//   QSound *start_sound=new QSound(":/res/music.wav",this);
+
     connect(ui->pre_month_pushButton, &QPushButton::clicked, this, [=]() {
         date_clicked(selected_date.addMonths(-1));
     });
@@ -32,10 +38,10 @@ calendar::calendar(QWidget *parent)
         date_clicked(selected_date.addMonths(1));
     });
     clear_calendar();
-    ui->date_label->setFixedSize(300, 30); // 设置固定大小
-    ui->time_label->setFixedSize(300, 30); // 设置固定大小
+
     // 将年月日设置到data_label
     ui->date_label->setText(QString(" %1 月 %2 日").arg(selected_date.month()).arg(selected_date.day()));
+    updateTimeLabel();
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &calendar::updateTimeLabel);
@@ -51,20 +57,14 @@ calendar::calendar(QWidget *parent)
     // 设置定时器间隔为1分钟
     timer_check_event->start(60000);
 
-
     int padding = 10; // 设置内边距大小
     ui->gridLayoutWidget->setContentsMargins(padding, padding, padding, padding);
     connect(this->ui->search_day_Button, &QPushButton::clicked, this, &calendar::onSearchDayPushButtonClicked);
     //创建日程
     QDir::setCurrent(QCoreApplication::applicationDirPath() + "/..");
-    default_plan_filename = "desktop_calendar/resources/plan.txt";//设置日程目录
+    default_plan_filename = "desktop_calendar/res/plan.txt";//设置日程目录
     connect(ui->add_plan_pushbutton, &QPushButton::clicked, this, &calendar::closest_to_the_event);
     read_plan_file();//读取日程文件
-    // 创建几个 plan 对象并添加到 plans 容器中
-    plans.push_back(plan(1, "Meeting", "Conference Room", "Discuss project timeline", QDateTime(QDate(2024, 4, 13), QTime(20, 21))));
-    plans.push_back(plan(2, "Lunch", "Cafeteria", "Meet with colleagues", QDateTime(QDate(2025, 6, 5), QTime(12, 0))));
-    plans.push_back(plan(3, "健身房", "Fitness Center", "Workout session", QDateTime(QDate(2025, 4, 5), QTime(18, 0))));
-   // plans[1].delete_mask=1;
 
     connect(this->ui->delete_Button, &QPushButton::clicked, this, [=]() {
             QModelIndexList selectedIndexes = ui->day_plans->selectionModel()->selectedRows();
@@ -77,24 +77,24 @@ calendar::calendar(QWidget *parent)
        show_calendar();
     });
 
-
     remind_window();
 }
 
 
 void calendar::display_all_plans(){
-    allplans_window=new Allplan;
+    allplans_window = new Allplan;
     sortPlans( plans, sort_plans);
-   // qDebug()<<sort_plans.size();
     allplans_window->displays_plans( plans, sort_plans);
     allplans_window->show();
 }
 
-void calendar::remind_window(){
-     sortPlans( plans, sort_plans);
-if(sort_plans.size()==0){
-    return;
-}
+void calendar::remind_window()
+{
+    sortPlans( plans, sort_plans);
+    if(sort_plans.empty())
+    {
+        return;
+    }
     // 获取 sort_plans 中第一个元素的值
     int planIndex = sort_plans[0];
     // 获取当前时间
@@ -102,12 +102,12 @@ if(sort_plans.size()==0){
     // 确保 plans 的索引有效
     if(planIndex >= 1 && planIndex <= plans.size()) {
         // 获取对应的 plan 对象
-    const plan& eventPlan = plans[planIndex - 1];
+        const plan& eventPlan = plans[planIndex - 1];
         // 比较计划的时间和当前时间的年月日时分是否一样
-    if(eventPlan.time.date() == currentTime.date() && eventPlan.time.toString("hh:mm") == currentTime.toString("hh:mm")) {
+        if(eventPlan.time.date() == currentTime.date() && eventPlan.time.toString("hh:mm") == currentTime.toString("hh:mm")) {
             // 将 plan 对象中的信息提取出来，放到提醒事件的窗口中
-        QSound* start_sound = new QSound(":/res/music.wav", this);
-                    start_sound->play();
+            auto* start_sound = new QSound(":/res/music.wav", this);
+            start_sound->play();
             QString title = eventPlan.title;
             QString location = eventPlan.location;
             QString information = eventPlan.information;
@@ -116,7 +116,7 @@ if(sort_plans.size()==0){
             // 创建提醒事件的窗口
             QMessageBox::information(this, "您有代办事情", QString("Title: %1\nLocation: %2\nInformation: %3\nTime: %4")
                                      .arg(title).arg(location).arg(information).arg(time.toString()));
-        }
+            }
     }
 }
 
@@ -246,11 +246,14 @@ void calendar::show_calendar()
     clear_calendar();
     QStringList weekdayLabels = {"一", "二", "三", "四", "五", "六", "日"};
     for (int i = 0; i < 7; ++i) {
-        QLabel *weekdayLabel = new QLabel(weekdayLabels[i], this);
+        auto *weekdayLabel = new QLabel(weekdayLabels[i], this);
         weekdayLabel->setAlignment(Qt::AlignCenter); // 居中对齐
         weekdayLabel->setFixedHeight(20); // 设置固定高度
         ui->gridLayout->addWidget(weekdayLabel, 0, i);
     }
+
+    ui->date_label->setText(QString(" %1 月 %2 日").arg(selected_date.month()).arg(selected_date.day()));
+
     QDate first_day_of_month = selected_date.addDays(-selected_date.day() + 1);//得到本月第一天的月、日
     int start_day = first_day_of_month.dayOfWeek(); // 获取当前月份的第一天是星期几
     int prev_month_days = start_day - 1;//本月有多少天不是本月里面的
@@ -259,7 +262,6 @@ void calendar::show_calendar()
     {
         for (int column = 0; column < 7; ++column)
         {
-
             auto *button = new QPushButton(this);
             connect(button, &QPushButton::clicked, this, [=]() {
                 date_clicked(tmp_date);
@@ -325,7 +327,6 @@ void calendar::date_clicked(const QDate &date)
 //查找某一天
 void calendar::onSearchDayPushButtonClicked()
 {
-
     QDateDialog dialog(this); // 假设存在一个名为 QDateDialog 的对话框类
     if (dialog.exec() == QDialog::Accepted) {
         QDate selectedDate = dialog.selectedDate();
@@ -395,45 +396,39 @@ void calendar::read_plan_file()
     file.close(); // 关闭文件
 }
 
-void calendar::sortPlans(QVector<plan> plans, QVector<int> &sortplants){
-
+void calendar::sortPlans(QVector<plan> curPlans, QVector<int> &sortplants){
 
     // 清空sortplants以防万一里面有旧数据
-        sortplants.clear();
-        // 获取当前系统时间
-            QDateTime currentDateTime = QDateTime::currentDateTime();
-        // 创建一个索引数组，初试状态下为0, 1, 2, ... n
-        QVector<int> indices(plans.size());
-        std::iota(indices.begin(), indices.end(), 0); // 需要#include <numeric>
+    sortplants.clear();
+    // 创建一个索引数组，初试状态下为0, 1, 2, ... n
+    QVector<int> indices(curPlans.size());
+    std::iota(indices.begin(), indices.end(), 0); // 需要#include <numeric>
 
-        // 使用std::sort和自定义比较函数来排序索引
-        std::sort(indices.begin(), indices.end(), [&](int i1, int i2) {
-            return comparePlans(plans[i1], plans[i2]);
-        });
-//qDebug()<<indices[0]<<indices[1];
-        // 把排序后的索引（需要加1，因为id从1开始）存入sortplants
-        for (int idx : indices) {
-                if (plans[idx].time.date() >= QDateTime::currentDateTime().date() ||(plans[idx].time.date() == QDateTime::currentDateTime().date()&&
-                        plans[idx].time.time().hour() * 60 + plans[idx].time.time().minute() >= QDateTime::currentDateTime().time().hour() * 60
-                        + QDateTime::currentDateTime().time().minute() )) {
-                    sortplants.push_back(idx + 1); // 下标加1变为id
-                    //qDebug()<<idx + 1<<" ";
-                }
+    // 使用std::sort和自定义比较函数来排序索引
+    std::sort(indices.begin(), indices.end(), [&](int i1, int i2) {
+        return comparePlans(curPlans[i1], curPlans[i2]);
+    });
+    // 把排序后的索引（需要加1，因为id从1开始）存入sortplants
+    for (int idx : indices) {
+            if (curPlans[idx].time.date() >= QDateTime::currentDateTime().date() || (curPlans[idx].time.date() == QDateTime::currentDateTime().date() &&
+                                                                                     curPlans[idx].time.time().hour() * 60 + curPlans[idx].time.time().minute() >= QDateTime::currentDateTime().time().hour() * 60
+                                                                                                                                                                   + QDateTime::currentDateTime().time().minute() )) {
+                sortplants.push_back(idx + 1); // 下标加1变为id
             }
+        }
 }
 // 在 calendar 类中添加一个方法来显示日程表
-void calendar::show_day_plans(const QVector<plan> &plans, const QVector<int> &sortplants, const QDate &selectedDate)
+void calendar::show_day_plans(const QVector<plan> &curPlans, const QVector<int> &sortplants, const QDate &selectedDate)
 {
     // 创建一个表格模型用于显示日程信息
-    QStandardItemModel *model = new QStandardItemModel(0, 4, this); // 设置初始行数为0
+    auto *model = new QStandardItemModel(0, 4, this); // 设置初始行数为0
 
     // 设置表头
     model->setHorizontalHeaderLabels(QStringList() << "Time" << "Information" << "Location" << "Title");
 
     // 遍历所有计划，筛选出当天的计划并添加到表格模型中
-    for (int i = 0; i < sortplants.size(); ++i) {
-        int id = sortplants[i];
-        const plan &myplan = plans[id - 1]; // id 从 1 开始，所以需要减去 1 获取正确的索引
+    for (int id : sortplants) {
+        const plan &myplan = curPlans[id - 1]; // id 从 1 开始，所以需要减去 1 获取正确的索引
 
         // 检查计划是否是选中日期的
         if (myplan.time.date() == selectedDate) {
@@ -446,7 +441,7 @@ void calendar::show_day_plans(const QVector<plan> &plans, const QVector<int> &so
             model->setItem(row, 1, new QStandardItem(myplan.information));
             model->setItem(row, 2, new QStandardItem(myplan.location));
             model->setItem(row, 3, new QStandardItem(myplan.title));
-            QPushButton *delete_Button = new QPushButton("Delete");
+            auto *delete_Button = new QPushButton("Delete");
                         connect(delete_Button, &QPushButton::clicked, [=]() {
                             deletePlan(row); // 调用删除日程的槽函数
                         });

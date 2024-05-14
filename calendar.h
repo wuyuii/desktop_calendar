@@ -43,19 +43,20 @@ public:
     Allplan *allplans_window;
     QVector<plan> plans;// 下标 + 1 对应 plan里的 id
     QVector<int> sort_plans;
+
     void show_calendar();
 
     void clear_calendar();
 
     void read_plan_file();
     // 比较两个计划时间的函数
-    bool comparePlans(const plan &a, const plan &b) {
+    static bool comparePlans(const plan &a, const plan &b) {
         return a.time < b.time;
     }
     void onSearchDayPushButtonClicked();//查找
-    void sortPlans(QVector<plan> plans, QVector<int> &sortplants);
+    void sortPlans(QVector<plan> curPlans, QVector<int> &sortplants);
     void display_specific_date_plans(const QDate &date);
-    void show_day_plans(const QVector<plan> &plans, const QVector<int> &sortplants, const QDate &selectedDate);
+    void show_day_plans(const QVector<plan> &curPlans, const QVector<int> &sortplants, const QDate &selectedDate);
     void deletePlan(int row);
 
 signals:

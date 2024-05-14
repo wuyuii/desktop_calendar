@@ -82,7 +82,6 @@ void plan::drop(const QString &filename, qint64 line_num)
 //查找偏移量
 qint64 plan::seek_offset(const QString& filename, qint64 line_num)
 {
-    // TODO 补充异常处理代码
 
     QFile file(filename); // 创建文件对象
     if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) // 以读写文本方式打开文件，检查是否成功打开文件
@@ -98,7 +97,7 @@ qint64 plan::seek_offset(const QString& filename, qint64 line_num)
     {
         if (in.atEnd()) // 如果已经到达文件末尾
         {
-            throw ; // 抛出异常，表示行数超出文件实际行数
+            throw std::out_of_range("行数超出文件实际行数");
         }
         in.readLine(); // 读取并丢弃当前行数据
     }
@@ -133,6 +132,7 @@ void plan::modify(const QString& filename, qint64 line_num)
 //写入日程
 bool plan::write(const QString &filename) const
 {
+    std::cout << filename.toStdString() << "\n";
     // 打开文件以追加方式写入日程信息
     QFile file(filename);
     if (file.open(QIODevice::Append | QIODevice::Text)) {
