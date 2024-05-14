@@ -52,19 +52,20 @@ calendar::calendar(QWidget *parent) : QMainWindow(parent), ui(new Ui::calendar) 
     // 连接定时器的timeout()信号到槽函数
     connect(timer_check_event, &QTimer::timeout, this, &calendar::remind_window);
 
-    // 设置定时器间隔为1分钟
-    timer_check_event->start(60000);
 
+    // 设置定时器间隔为1分钟
+    timer_check_event->start(40000);
+   // remind_window();
     int padding = 10; // 设置内边距大小
     ui->gridLayoutWidget->setContentsMargins(padding, padding, padding, padding);
     connect(this->ui->search_day_Button, &QPushButton::clicked, this, &calendar::onSearchDayPushButtonClicked);
     //创建日程
     QDir::setCurrent(QCoreApplication::applicationDirPath() + "/..");
-    default_plan_filename = "res/plan.txt";//设置日程目录
+    default_plan_filename = "desktop_calendar/res/plan.txt";//设置日程目录
 
     connect(ui->add_plan_pushbutton, &QPushButton::clicked, this, &calendar::closest_to_the_event);
     read_plan_file();//读取日程文件
-
+    remind_window();
     connect(this->ui->delete_Button, &QPushButton::clicked, this, [=]() {
         QModelIndexList selectedIndexes = ui->day_plans->selectionModel()->selectedRows();
         if (!selectedIndexes.isEmpty()) {
@@ -75,7 +76,7 @@ calendar::calendar(QWidget *parent) : QMainWindow(parent), ui(new Ui::calendar) 
         show_calendar();
     });
 
-    remind_window();
+
 }
 
 
@@ -88,35 +89,42 @@ void calendar::display_all_plans() {
 
 void calendar::remind_window() {
     sortPlans(plans, sort_plans);
-    if (sort_plans.empty()) {
+
+    if (sort_plans.size() == 0) {
         return;
     }
-    // 获取 sort_plans 中第一个元素的值
-    int planIndex = sort_plans[0];
+
     // 获取当前时间
     QDateTime currentTime = QDateTime::currentDateTime();
-    // 确保 plans 的索引有效
-    if (planIndex >= 1 && planIndex <= plans.size()) {
-        // 获取对应的 plan 对象
-        const plan &eventPlan = plans[planIndex - 1];
-        // 比较计划的时间和当前时间的年月日时分是否一样
-        if (eventPlan.time.date() == currentTime.date() &&
-            eventPlan.time.toString("hh:mm") == currentTime.toString("hh:mm")) {
-            // 将 plan 对象中的信息提取出来，放到提醒事件的窗口中
-            auto *start_sound = new QSound(":/res/music.wav", this);
-            start_sound->play();
-            QString title = eventPlan.title;
-            QString location = eventPlan.location;
-            QString information = eventPlan.information;
-            QDateTime time = eventPlan.time;
 
-            // 创建提醒事件的窗口
-            QMessageBox::information(this, "您有代办事情",
-                                     QString("Title: %1\nLocation: %2\nInformation: %3\nTime: %4").arg(title).arg(
-                                             location).arg(information).arg(time.toString()));
+    // 遍历排序后的计划数组
+    for (int planIndex : sort_plans) {
+        // 确保 plans 的索引有效
+        if (planIndex >= 1 && planIndex <= plans.size()) {
+            // 获取对应的 plan 对象
+            const plan& eventPlan = plans[planIndex - 1];
+
+
+            // 比较计划的时间和当前时间的年月日时分是否一样
+            if (eventPlan.time.date() == currentTime.date() && eventPlan.time.toString("hh:mm") == currentTime.toString("hh:mm")) {
+                // 将 plan 对象中的信息提取出来，放到提醒事件的窗口中
+
+                QSound::play(":/music/res/music_plus.wav");
+                QString title = eventPlan.title;
+                QString location = eventPlan.location;
+                QString information = eventPlan.information;
+                QDateTime time = eventPlan.time;
+              //  qDebug() << "asdasdasd";
+
+                // 创建提醒事件的窗口
+                QMessageBox::information(this, "您有代办事情", QString("Title: %1\nLocation: %2\nInformation: %3\nTime: %4")
+                                         .arg(title).arg(location).arg(information).arg(time.toString()));
+                break;  // 找到匹配的计划后跳出循环
+            }
         }
     }
 }
+
 
 void calendar::closest_to_the_event() {
     QDialog dialog(this);

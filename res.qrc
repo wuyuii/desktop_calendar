@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/music">
         <file>res/music.wav</file>
+        <file>res/music_plus.wav</file>
     </qresource>
     <qresource prefix="/image">
         <file>res/background1.jpg</file>
