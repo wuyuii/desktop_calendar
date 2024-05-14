@@ -16,13 +16,15 @@
 #include<QStandardItemModel>
 #include <QCoreApplication>
 #include <QDir>
-
+#include<QScrollBar>
 calendar::calendar(QWidget *parent) : QMainWindow(parent), ui(new Ui::calendar) {
     ui->setupUi(this);
+    setFixedSize(1400,731);
     // 设置窗口背景图片
     QPixmap background(":/image/res/background3.png");
     QPalette palette;
     palette.setBrush(this->backgroundRole(), QBrush(background));
+
     this->setPalette(palette);
 
     cur_date = QDate::currentDate();
@@ -61,7 +63,7 @@ calendar::calendar(QWidget *parent) : QMainWindow(parent), ui(new Ui::calendar) 
     connect(this->ui->search_day_Button, &QPushButton::clicked, this, &calendar::onSearchDayPushButtonClicked);
     //创建日程
     QDir::setCurrent(QCoreApplication::applicationDirPath() + "/..");
-    default_plan_filename = "desktop_calendar/res/plan.txt";//设置日程目录
+    default_plan_filename = "    plan.txt";//设置日程目录
 
     connect(ui->add_plan_pushbutton, &QPushButton::clicked, this, &calendar::closest_to_the_event);
     read_plan_file();//读取日程文件
@@ -75,7 +77,8 @@ calendar::calendar(QWidget *parent) : QMainWindow(parent), ui(new Ui::calendar) 
     connect(this->ui->refresh_Button, &QPushButton::clicked, this, [=]() {
         show_calendar();
     });
-
+    ui->refresh_Button->click();
+    remind_window();
 
 }
 
@@ -192,6 +195,7 @@ void calendar::closest_to_the_event() {
             QMessageBox::critical(&dialog, "错误", "无法打开文件进行写入.");
         }
         dialog.close(); // 关闭对话框
+        ui->refresh_Button->click();
     });
 
     // 连接取消按钮的点击信号到对话框的关闭槽函数
@@ -321,7 +325,8 @@ void calendar::show_calendar() {
 
 void calendar::date_clicked(const QDate &date) {
     selected_date = date;
-    show_calendar();
+    ui->refresh_Button->click();
+    show_day_plans(plans, sort_plans, selected_date);
 
 }
 
@@ -411,13 +416,12 @@ void calendar::sortPlans(QVector<plan> curPlans, QVector<int> &sortplants) {
 }
 
 // 在 calendar 类中添加一个方法来显示日程表
-void
-calendar::show_day_plans(const QVector<plan> &curPlans, const QVector<int> &sortplants, const QDate &selectedDate) {
+void calendar::show_day_plans(const QVector<plan> &curPlans, const QVector<int> &sortplants, const QDate &selectedDate) {
     // 创建一个表格模型用于显示日程信息
     auto *model = new QStandardItemModel(0, 4, this); // 设置初始行数为0
 
     // 设置表头
-    model->setHorizontalHeaderLabels(QStringList() << "Time" << "Information" << "Location" << "Title");
+    model->setHorizontalHeaderLabels(QStringList() << "时间" << "标题" << "地点" << "信息");
 
     // 遍历所有计划，筛选出当天的计划并添加到表格模型中
     for (int id: sortplants) {
@@ -428,12 +432,12 @@ calendar::show_day_plans(const QVector<plan> &curPlans, const QVector<int> &sort
             // 在表格模型中添加该日程
             int row = model->rowCount(); // 获取当前行数
             model->insertRow(row); // 插入新行
-
+            QString formattedTime = myplan.time.toString("dddd yyyy-MM-dd HH:mm"); // 使用指定格式显示时间，包括星期几
             // 添加日程信息到对应的单元格
-            model->setItem(row, 0, new QStandardItem(myplan.time.toString()));
-            model->setItem(row, 1, new QStandardItem(myplan.information));
+            model->setItem(row, 0, new QStandardItem(formattedTime));
+            model->setItem(row, 1, new QStandardItem(myplan.title));
             model->setItem(row, 2, new QStandardItem(myplan.location));
-            model->setItem(row, 3, new QStandardItem(myplan.title));
+            model->setItem(row, 3, new QStandardItem(myplan.information));
             auto *delete_Button = new QPushButton("Delete");
             connect(delete_Button, &QPushButton::clicked, [=]() {
                 deletePlan(row); // 调用删除日程的槽函数
@@ -453,31 +457,46 @@ calendar::show_day_plans(const QVector<plan> &curPlans, const QVector<int> &sort
     ui->day_plans->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch); // 地点列自动适应内容大小
     ui->day_plans->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch); // 标题列自动适应内容大小
 
-    QString styleSheet = "QTableView {"
-                         "    background-color: #f0f0f0;" // 设置背景色
-                         "    border: 1px solid #ccc;" // 设置边框
-                         "}"
-                         "QTableView::item {"
-                         "    padding: 5px;" // 设置内边距
-                         "}"
-                         "QTableView::item:selected {"
-                         "    background-color: #a0c6e3;" // 设置选中行的背景色
-                         "}"
-                         "QHeaderView::section {"
-                         "    background-color: #d3d3d3;" // 设置表头的背景色
-                         "    color: #333;" // 设置表头文字颜色
-                         "    padding: 5px;" // 设置表头内边距
-                         "}";
+    ui->day_plans->verticalScrollBar()->setStyleSheet("QScrollBar:vertical{background:transparent;" //垂直滑块整体/背景透明
+       "width:20px;padding-left:14px;padding-right:1px;}"    //左/右预留位置
+       "QScrollBar::handle:vertical{"//滑块样式
+       "background:#929292;"  //滑块颜色
+       "border-radius:2px;"   //边角圆润
+       "min-height:50px;}"    //滑块最小高度
+       "QScrollBar::handle:vertical:hover{background:#929292;}"//鼠标触及滑块样式/滑块颜色
+       "QScrollBar::add-line:vertical{border:none;}"//向下箭头样式
+       "QScrollBar::sub-line:vertical{border:none;}"//向上箭头样式
+       "QScrollBar::add-page:vertical{background: #C9C9C9;border-radius:2px;}"//滑块所在垂直区域
+       "QScrollBar::sub-page:vertical{background: #C9C9C9;border-radius:2px;}");//滑块所在区域
 
-    ui->day_plans->setStyleSheet(styleSheet);
+   ui->day_plans->setStyleSheet("QTableView#device_author_tableview{background: transparent;border: 0px solid red;color: black;"
+       "alternate-background-color: rgb(141, 163, 215);"
+       "selection-background-color: #D7D7D7;}"//选中区域的背景色
+       "QTableView#device_author_tableview::item{background:#E7E7E7;border:0px solid green;}"
+       "QTableView#device_author_tableview::item:selected{background:#D7D7D7;border:0px solid green;}"
+       "QTableView#device_author_tableview::item:hover{background:#D7D7D7;}");
+   QString styleSheet =
+           "QTableView {"
+           "    border-radius: 10px;" // 设置圆角
+           "    border: 2px solid #aaaaaa;" // 设置边框
+           "    border: none;" // 取消边框
+           "}"
+           "QTableView::item:selected {"
+           "    background-color: #a0c6e3;" // 设置选中行的背景色
+
+           "}"
+           ;
+
+   ui->day_plans->setStyleSheet(styleSheet);
     // 添加交互效果
     ui->day_plans->setSelectionBehavior(QAbstractItemView::SelectRows); // 设置选中整行
-    ui->day_plans->setSelectionMode(QAbstractItemView::SingleSelection); // 设置单选模式
+    //ui->day_plans->setSelectionMode(QAbstractItemView::SingleSelection); // 设置单选模式
     ui->day_plans->setEditTriggers(QAbstractItemView::NoEditTriggers); // 禁止编辑
 
 }
 
-void calendar::deletePlan(int row) {
+void calendar::deletePlan(int row)
+{
     if (row < 0 || row >= ui->day_plans->model()->rowCount()) {
         return;
     }
@@ -491,11 +510,51 @@ void calendar::deletePlan(int row) {
 
         // 更新 sort_plans 数组
         sort_plans.remove(row);
+        // 更新 sort_plans 数组中大于被删除索引的值
+                for (int i = 0; i < sort_plans.size(); ++i) {
+                    if (sort_plans[i] > planIndex) {
+                        sort_plans[i]--;
+                    }
+                }
+
+        // 更新文件内容
+        QString filename = default_plan_filename;
+        QFile file(filename);
+        if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
+            qDebug() << "Failed to open file: " << filename;
+            return;
+        }
+
+        QTextStream in(&file);
+        QStringList lines;
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            if (line.isEmpty()) {
+                break;
+            }
+            lines.append(line);
+        }
+
+        file.resize(0); // 清空文件内容
+
+        // 修改被删除日程的首行
+        if (planIndex - 1 < lines.size()) {
+            lines[planIndex - 1].replace(0, 1, '1');
+        }
+
+        QTextStream out(&file);
+        for (const QString &line: lines) {
+            out << line << "\n";
+        }
+
+        file.close();
 
         // 重新显示日程
         show_day_plans(plans, sort_plans, selected_date);
     }
 }
+
+
 
 
 calendar::~calendar() {
