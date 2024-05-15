@@ -15,7 +15,7 @@
 
 const QString plan::DELIMITER = "|";
 
-plan::plan() {}
+plan::plan() = default;
 
 plan::plan(size_t id, QString title, QString location, QString information, QDateTime time) : id(id),
                                                                                               title(std::move(title)),
@@ -35,9 +35,8 @@ QString plan::to_string() const {
 
 void plan::update(const QString &filename, qint64 offset) {
     QFile file(filename); // 创建文件对象
-    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) // 以读写文本方式打开文件，检查是否成功打开文件
-    {
-        qDebug() << "Failed to open file: " << file.errorString(); // 输出错误信息
+    // 以读写文本方式打开文件，检查是否成功打开文件
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         return; // 返回，不进行后续操作
     }
 
@@ -59,9 +58,8 @@ void plan::drop(const QString &filename, qint64 line_num) {
     delete_mask = 1;
     qint64 offset = seek_offset(filename, line_num);
     QFile file(filename); // 创建文件对象
-    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) // 以读写文本方式打开文件，检查是否成功打开文件
-    {
-        qDebug() << "Failed to open file: " << file.errorString(); // 输出错误信息
+    // 以读写文本方式打开文件，检查是否成功打开文件
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         return; // 返回，不进行后续操作
     }
 
@@ -88,9 +86,8 @@ void plan::drop(const QString &filename, qint64 line_num) {
 qint64 plan::seek_offset(const QString &filename, qint64 line_num) {
 
     QFile file(filename); // 创建文件对象
-    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) // 以读写文本方式打开文件，检查是否成功打开文件
-    {
-        qDebug() << "Failed to open file: " << file.errorString(); // 抛出异常
+    // 以读写文本方式打开文件，检查是否成功打开文件
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         return -1;
     }
 
@@ -117,9 +114,8 @@ void plan::modify(const QString &filename, qint64 line_num) {
     qint64 offset = seek_offset(filename, line_num);
 
     QFile file(filename); // 创建文件对象
-    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) // 以读写文本方式打开文件，检查是否成功打开文件
-    {
-        qDebug() << "Failed to open file: " << file.errorString(); // 输出错误信息
+    // 以读写文本方式打开文件，检查是否成功打开文件
+    if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         return; // 返回，不进行后续操作
     }
 

@@ -17,9 +17,10 @@
 #include <QCoreApplication>
 #include <QDir>
 #include<QScrollBar>
+
 calendar::calendar(QWidget *parent) : QMainWindow(parent), ui(new Ui::calendar) {
     ui->setupUi(this);
-    setFixedSize(1400,731);
+    setFixedSize(1400, 731);
     // 设置窗口背景图片
     QPixmap background(":/image/res/background3.png");
     QPalette palette;
@@ -416,7 +417,8 @@ void calendar::sortPlans(QVector<plan> curPlans, QVector<int> &sortplants) {
 }
 
 // 在 calendar 类中添加一个方法来显示日程表
-void calendar::show_day_plans(const QVector<plan> &curPlans, const QVector<int> &sortplants, const QDate &selectedDate) {
+void
+calendar::show_day_plans(const QVector<plan> &curPlans, const QVector<int> &sortplants, const QDate &selectedDate) {
     // 创建一个表格模型用于显示日程信息
     auto *model = new QStandardItemModel(0, 4, this); // 设置初始行数为0
 
@@ -458,36 +460,35 @@ void calendar::show_day_plans(const QVector<plan> &curPlans, const QVector<int> 
     ui->day_plans->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch); // 标题列自动适应内容大小
 
     ui->day_plans->verticalScrollBar()->setStyleSheet("QScrollBar:vertical{background:transparent;" //垂直滑块整体/背景透明
-       "width:20px;padding-left:14px;padding-right:1px;}"    //左/右预留位置
-       "QScrollBar::handle:vertical{"//滑块样式
-       "background:#929292;"  //滑块颜色
-       "border-radius:2px;"   //边角圆润
-       "min-height:50px;}"    //滑块最小高度
-       "QScrollBar::handle:vertical:hover{background:#929292;}"//鼠标触及滑块样式/滑块颜色
-       "QScrollBar::add-line:vertical{border:none;}"//向下箭头样式
-       "QScrollBar::sub-line:vertical{border:none;}"//向上箭头样式
-       "QScrollBar::add-page:vertical{background: #C9C9C9;border-radius:2px;}"//滑块所在垂直区域
-       "QScrollBar::sub-page:vertical{background: #C9C9C9;border-radius:2px;}");//滑块所在区域
+                                                      "width:20px;padding-left:14px;padding-right:1px;}"    //左/右预留位置
+                                                      "QScrollBar::handle:vertical{"//滑块样式
+                                                      "background:#929292;"  //滑块颜色
+                                                      "border-radius:2px;"   //边角圆润
+                                                      "min-height:50px;}"    //滑块最小高度
+                                                      "QScrollBar::handle:vertical:hover{background:#929292;}"//鼠标触及滑块样式/滑块颜色
+                                                      "QScrollBar::add-line:vertical{border:none;}"//向下箭头样式
+                                                      "QScrollBar::sub-line:vertical{border:none;}"//向上箭头样式
+                                                      "QScrollBar::add-page:vertical{background: #C9C9C9;border-radius:2px;}"//滑块所在垂直区域
+                                                      "QScrollBar::sub-page:vertical{background: #C9C9C9;border-radius:2px;}");//滑块所在区域
 
-   ui->day_plans->setStyleSheet("QTableView#device_author_tableview{background: transparent;border: 0px solid red;color: black;"
-       "alternate-background-color: rgb(141, 163, 215);"
-       "selection-background-color: #D7D7D7;}"//选中区域的背景色
-       "QTableView#device_author_tableview::item{background:#E7E7E7;border:0px solid green;}"
-       "QTableView#device_author_tableview::item:selected{background:#D7D7D7;border:0px solid green;}"
-       "QTableView#device_author_tableview::item:hover{background:#D7D7D7;}");
-   QString styleSheet =
-           "QTableView {"
-           "    border-radius: 10px;" // 设置圆角
-           "    border: 2px solid #aaaaaa;" // 设置边框
-           "    border: none;" // 取消边框
-           "}"
-           "QTableView::item:selected {"
-           "    background-color: #a0c6e3;" // 设置选中行的背景色
+    ui->day_plans->setStyleSheet(
+            "QTableView#device_author_tableview{background: transparent;border: 0px solid red;color: black;"
+            "alternate-background-color: rgb(141, 163, 215);"
+            "selection-background-color: #D7D7D7;}"//选中区域的背景色
+            "QTableView#device_author_tableview::item{background:#E7E7E7;border:0px solid green;}"
+            "QTableView#device_author_tableview::item:selected{background:#D7D7D7;border:0px solid green;}"
+            "QTableView#device_author_tableview::item:hover{background:#D7D7D7;}");
+    QString styleSheet = "QTableView {"
+                         "    border-radius: 10px;" // 设置圆角
+                         "    border: 2px solid #aaaaaa;" // 设置边框
+                         "    border: none;" // 取消边框
+                         "}"
+                         "QTableView::item:selected {"
+                         "    background-color: #a0c6e3;" // 设置选中行的背景色
 
-           "}"
-           ;
+                         "}";
 
-   ui->day_plans->setStyleSheet(styleSheet);
+    ui->day_plans->setStyleSheet(styleSheet);
     // 添加交互效果
     ui->day_plans->setSelectionBehavior(QAbstractItemView::SelectRows); // 设置选中整行
     //ui->day_plans->setSelectionMode(QAbstractItemView::SingleSelection); // 设置单选模式
@@ -495,8 +496,7 @@ void calendar::show_day_plans(const QVector<plan> &curPlans, const QVector<int> 
 
 }
 
-void calendar::deletePlan(int row)
-{
+void calendar::deletePlan(int row) {
     if (row < 0 || row >= ui->day_plans->model()->rowCount()) {
         return;
     }
@@ -511,17 +511,16 @@ void calendar::deletePlan(int row)
         // 更新 sort_plans 数组
         sort_plans.remove(row);
         // 更新 sort_plans 数组中大于被删除索引的值
-                for (int i = 0; i < sort_plans.size(); ++i) {
-                    if (sort_plans[i] > planIndex) {
-                        sort_plans[i]--;
-                    }
-                }
+        for (int &sort_plan: sort_plans) {
+            if (sort_plan > planIndex) {
+                sort_plan--;
+            }
+        }
 
         // 更新文件内容
         QString filename = default_plan_filename;
         QFile file(filename);
         if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-            qDebug() << "Failed to open file: " << filename;
             return;
         }
 
@@ -553,8 +552,6 @@ void calendar::deletePlan(int row)
         show_day_plans(plans, sort_plans, selected_date);
     }
 }
-
-
 
 
 calendar::~calendar() {
