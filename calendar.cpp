@@ -64,7 +64,7 @@ calendar::calendar(QWidget *parent) : QMainWindow(parent), ui(new Ui::calendar) 
     connect(this->ui->search_day_Button, &QPushButton::clicked, this, &calendar::onSearchDayPushButtonClicked);
     //创建日程
     QDir::setCurrent(QCoreApplication::applicationDirPath() + "/..");
-    default_plan_filename = "    plan.txt";//设置日程目录
+    default_plan_filename = "plan.txt";//设置日程目录
 
     connect(ui->add_plan_pushbutton, &QPushButton::clicked, this, &calendar::closest_to_the_event);
     read_plan_file();//读取日程文件

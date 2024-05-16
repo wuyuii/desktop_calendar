@@ -28,9 +28,8 @@ plan::plan(size_t id, QString title, QString location, QString information, QDat
 }
 
 QString plan::to_string() const {
-    return time.toString(
-            (delete_mask ? '1' : '0') + transcoding(title) + DELIMITER + transcoding(location) + DELIMITER +
-            transcoding(information) + DELIMITER + "yyyy-MM-dd hh:mm") + "\n";
+    return  (delete_mask ? "1" : "0") + transcoding(title) + DELIMITER + transcoding(location) + DELIMITER +
+            transcoding(information) + DELIMITER + time.toString("yyyy-MM-dd hh:mm") + "\n";
 }
 
 void plan::update(const QString &filename, qint64 offset) {
