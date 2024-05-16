@@ -55,7 +55,7 @@ public:
     static bool comparePlans(const plan &a, const plan &b) {
         return a.time < b.time;
     }
-
+    bool validateDate(const QDate& date);
     void onSearchDayPushButtonClicked();//查找
     void sortPlans(QVector<plan> curPlans, QVector<int> &sortplants);
 
