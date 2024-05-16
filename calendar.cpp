@@ -21,6 +21,7 @@
 calendar::calendar(QWidget *parent) : QMainWindow(parent), ui(new Ui::calendar) {
     ui->setupUi(this);
     setFixedSize(1400, 731);
+    setWindowIcon(QIcon(":/image/res/favicon.ico"));
     // 设置窗口背景图片
     QPixmap background(":/image/res/background3.png");
     QPalette palette;
