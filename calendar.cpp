@@ -80,8 +80,6 @@ calendar::calendar(QWidget *parent) : QMainWindow(parent), ui(new Ui::calendar) 
         show_calendar();
     });
     ui->refresh_Button->click();
-    remind_window();
-
 }
 
 
@@ -331,13 +329,36 @@ void calendar::date_clicked(const QDate &date) {
     show_day_plans(plans, sort_plans, selected_date);
 
 }
-
-//查找某一天
+//检查查找范围
+bool calendar::validateDate(const QDate& date) {
+    // 检查月份范围
+    if (date.month() < 1 || date.month() > 12) {
+        QMessageBox::warning(this, tr("无效日期"), tr("月份应在 1 到 12 之间。"));
+        return false;
+    }
+    // 检查天数范围
+    if (date.day() < 1 || date.day() > date.daysInMonth()) {
+        QMessageBox::warning(this, tr("无效日期"), tr("所选月份的日期超出范围。"));
+        return false;
+    }
+    // 可选：检查年份范围
+    if (date.year() < 1900 || date.year() > QDate::currentDate().year()) {
+        QMessageBox::warning(this, tr("无效日期"), tr("年份应在 1900 年到当前年份之间。"));
+        return false;
+    }
+    return true;
+}
+//跳转日期
 void calendar::onSearchDayPushButtonClicked() {
-    QDateDialog dialog(this); // 假设存在一个名为 QDateDialog 的对话框类
+    QDateDialog dialog(this);
     if (dialog.exec() == QDialog::Accepted) {
         QDate selectedDate = dialog.selectedDate();
-        date_clicked(selectedDate); // 调用原来的 date_clicked 函数处理选中日期的逻辑
+
+        // 验证日期是否有效
+        if (!validateDate(selectedDate))
+            return;
+
+        date_clicked(selectedDate);
     }
 }
 
